@@ -33,12 +33,29 @@ def visualize(X, y, features):
     plt.tight_layout()
     plt.show()
 
+def split_data_8020(X, Y):
+    #select columns from x, y
+    trainingSet, testSet = [], []
+    chosenSamples = random.sample(range(len(Y)),
+                                  len(Y)//5)
+    #need whole numbers to divide, use the operator //
+    for i in range(len(Y)):
+        #implement insert xy sample tuple for now
+        if i not in chosenSamples:
+            trainingSet.append((X[i:,], Y[i]))#ROW of X
+        elif i in chosenSamples:
+            testSet.append((X[i:,], Y[i])) 
+    return trainingSet, testSet
+
 
 def fit_regression(X,Y):
     #TODO: implement linear regression
     # Remember to use np.linalg.solve instead of inverting!
     #raise NotImplementedError()
-    return 0
+    w = []
+    w_col = np.linalg.solve(np.transpose(X), np.transpose(Y))
+    w.append(w_col)
+    return w
 
 def main():
     # Load the data

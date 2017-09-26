@@ -28,6 +28,8 @@ def visualize(X, y, features):
         plt.subplot(3, 5, i + 1)
         #TODO: Plot feature i against y
         plt.plot(X[:,i], y, '.')
+        plt.ylabel("Price")
+        plt.xlabel(features[i])
     plt.tight_layout()
     plt.show()
 

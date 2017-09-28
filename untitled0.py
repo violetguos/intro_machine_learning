@@ -52,9 +52,9 @@ def fit_regression(X,Y):
     #TODO: implement linear regression
     # Remember to use np.linalg.solve instead of inverting!
     #raise NotImplementedError()
-    inv_xtx = np.linalg.inv(np.dot(np.transpose(X), X))
-    inv_xtx_xt = np.dot(inv_xtx, np.transpose(X))
-    w = np.dot(inv_xtx_xt, Y)
+    xtx = np.dot(np.transpose(X), X)
+    xty = np.dot(np.transpose(X), Y)
+    w = np.linalg.solve(xtx, xty)
     return w
 
 def main():

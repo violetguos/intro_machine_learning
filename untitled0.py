@@ -47,6 +47,12 @@ def split_data_8020(X, Y):
             testSet.append((X[i:,], Y[i])) 
     return trainingSet, testSet
 
+def tabulate_weight(w, x):
+    for i in range(len(x)):
+        for a, b in zip(w,x[i]):
+            #print "{}\t{}".format(repr(a),repr(b))
+            c =1
+    #plt.show()
 
 def fit_regression(X,Y):
     #TODO: implement linear regression
@@ -55,7 +61,13 @@ def fit_regression(X,Y):
     xtx = np.dot(np.transpose(X), X)
     xty = np.dot(np.transpose(X), Y)
     w = np.linalg.solve(xtx, xty)
-    return w
+    #print type(w)
+    #w_1 = np.append([1], w) #add the bias term
+    tabulate_weight(w, X)
+    return w #w_1
+
+
+
 
 def main():
     # Load the data
@@ -70,9 +82,25 @@ def main():
     
     # Fit regression model
     w = fit_regression(X, y)
+    #print w
 
     # Compute fitted values, MSE, etc.
     
+    y_hat = np.dot(X, w)
+    #print "y_hat ", y_hat
+    #print "y ", y
+    
+    #MSE
+    mse = ((y_hat - y) **2).mean(axis = 0)
+    #print mse
+    
+    #another two error measures: 
+        #mean norm, mean root
+    mnorm = np.absolute(y_hat - y)
+    #print mnorm
+    
+    
+        
 
 if __name__ == "__main__":
     main()

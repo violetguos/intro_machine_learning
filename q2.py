@@ -145,7 +145,7 @@ def partition_k(x, y, num, i):
     #print ("x_test", np.shape(x_test))
     A= x[0:(i*num),:]
     #print("len a", len(A))
-    B = x[((i+2)*num): ,: ]   
+    B = x[((i+1)*num): ,: ]   
     #print ("B shape", np.shape(B))
     
     if len(A) ==0:
@@ -154,7 +154,7 @@ def partition_k(x, y, num, i):
         x_train = np.concatenate((A, B), axis =0) #select the rest 304x14
     #print (np.shape(x_train))   
     y_test = y[(i*num):((i+1)*num)] #select elems from array
-    y_train  = np.concatenate([y[0:(i)*num], y[(i+2)*num:]]) #select the rest 304
+    y_train  = np.concatenate([y[0:(i)*num], y[(i+1)*num:]]) #select the rest 304
     #print(len(y_test))
     #print("y len = ", len(y_train))
     
@@ -187,3 +187,5 @@ if __name__ == "__main__":
 
     plt.plot(losses)
     print("min loss = {}".format(losses.min()))
+
+    #min loss = 63.9109756781

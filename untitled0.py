@@ -128,9 +128,16 @@ def main():
     #another two error measures: 
         #mean norm, mean root
     mnorm = np.absolute(y_hat - testing_y)
-    print mnorm
+    #print mnorm
     
-    
+    #feacture selection
+    print "-----feature ranking----"
+    for i in range(len(X[1])):
+        y_hat = np.dot(X[:,i], w[i]) #this is 506 instances
+        #print y_hat
+        #print len(X[:,i])
+        mse = ((y_hat - y[i]) **2).mean()
+        print "%s, %f ", features[i], mse
         
 
 if __name__ == "__main__":

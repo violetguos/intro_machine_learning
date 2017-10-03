@@ -74,21 +74,38 @@ def cosine_similarity(vec1, vec2):
     return dot / (sum1 * sum2)
 
 #TODO: implement linear regression gradient
-def lin_reg_gradient(X, y, w, m):
+def lin_reg_gradient(X, y, w):
     '''
     Compute gradient of linear regression model parameterized by w
     '''
     xTrans = np.transpose(X)
-    gradsum = 0
-    for i in range(0, m):
-        xtx = np.dot(xTrans, X)
-        xtxw =2*np.dot(xtx, w)
-        xty = 2*np.dot(xTrans, y)
-        grad = xtxw - xty
-        gradsum += grad
+    xtx = np.dot(xTrans, X)
+    xtxw =2*np.dot(xtx, w)
+    xty = 2*np.dot(xTrans, y)
+    grad = xtxw - xty
     
-    gradient = gradsum /m
-    return gradient
+    return grad
+
+def grad_var_m(x,y,w,m,k):
+    for i in range(0,k):
+        w_j = []
+
+        for m in range(1, 400):
+            batch_grad = lin_reg_gradient(X_b, y_b, w)
+            w_j.append(batch_grad)
+            
+        print "average" , (reduce(lambda x, y: x + y, w_j) / len(w_j))
+
+
+def grad_500(x, y, w, k):
+    grad_sum =0
+    for i in range(0,k):
+        batch_grad = lin_reg_gradient(x, y, w)
+        grad_sum +=batch_grad
+    
+    b_grad = grad_sum / k
+    print batch_grad  
+    return b_grad
 
 def main():
     # Load data and randomly initialise weights
@@ -101,22 +118,24 @@ def main():
     k = 500
     m = 50
     X_b, y_b = batch_sampler.get_batch(m)
-    #for i in range(0,k):
-    batch_grad = lin_reg_gradient(X_b, y_b, w, m)
-    true_grad = lin_reg_gradient(X, y, w, len(y))
-    #print batch_grad
-    
-    #varience
-    w_j = []
-    for i in range(0,k):
-        for m in range(1, 400):
-            batch_grad = lin_reg_gradient(X_b, y_b, w, m)
-            w_j.append(batch_grad)
-    
-    print "average" , reduce(lambda x, y: x + y, w_j) / len(w_j)
+    batch_grad = grad_500(X_b, y_b, w, k)
+    print "final avg,", batch_grad
+    true_grad = lin_reg_gradient(X, y, w)
 
     
-    #print true_grad
+    #varience
+    
+    
+
+    
+    print true_grad
+    
+    '''
+    [   905147.49317521   1938519.97649744   2407949.76862212 ...,
+   3509262.95811409  64912228.61128841   2572091.7828057 ]
+[  7.96380447e+06   1.90440009e+07   2.21960820e+07 ...,   3.46361153e+07
+   6.66448338e+08   2.46394200e+07]
+    '''
     
 
 if __name__ == '__main__':

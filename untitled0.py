@@ -15,7 +15,10 @@ import random
 def load_data():
     boston = datasets.load_boston()
     X = boston.data
+    #506 row, 13 columns
+    #print X.shape[0]
     y = boston.target #y is the price
+    #print y.shape[0]
     features = boston.feature_names
     return X,y,features
 
@@ -35,34 +38,53 @@ def visualize(X, y, features):
 
 def split_data_8020(X, Y):
     #select columns from x, y
-    trainingSet, testSet = [], []
+    xrows = X.shape[1]
+
     chosenSamples = random.sample(range(len(Y)),
                                   len(Y)//5)
+    t_len = len(Y) - len(chosenSamples)
+    sample_len = len(chosenSamples)
+    trainingSetX = np.zeros((t_len, xrows))
+    testSetX = np.zeros((sample_len, xrows) )
+    trainingSetY = np.zeros(t_len)
+    testSetY = np.zeros(sample_len)
+    ii, ij = 0,0
     #need whole numbers to divide, use the operator //
     for i in range(len(Y)):
         #implement insert xy sample tuple for now
         if i not in chosenSamples:
-            trainingSet.append((X[i:,], Y[i]))#ROW of X
+            #what = X[i,]
+            #print "wnat", what
+            trainingSetX[ii,] = X[i,]
+            #print "tslit, train X, ", len(trainingSetX)
+            trainingSetY[ii]= Y[i]#ROW of X
+            #print "thwaraw " ,X[i,]
+            ii +=1
+            
         elif i in chosenSamples:
-            testSet.append((X[i:,], Y[i])) 
-    return trainingSet, testSet
+            testSetX[ij,]=X[i,]
+            testSetY[ij]=Y[i]
+            ij +=1
+            
+    #print trainingSetX #.shape[0], testSetX.shape[0], trainingSetY, testSetY
+
+    return trainingSetX, testSetX,\
+             trainingSetY, testSetY
 
 def tabulate_weight(w, x):
     for i in range(len(x)):
         for a, b in zip(w,x[i]):
             #print "{}\t{}".format(repr(a),repr(b))
-            c =1
-    #plt.show()
+            c =1 #dummy
+    plt.show()
 
 def fit_regression(X,Y):
     #TODO: implement linear regression
     # Remember to use np.linalg.solve instead of inverting!
-    #raise NotImplementedError()
     xtx = np.dot(np.transpose(X), X)
     xty = np.dot(np.transpose(X), Y)
     w = np.linalg.solve(xtx, xty)
     #print type(w)
-    #w_1 = np.append([1], w) #add the bias term
     tabulate_weight(w, X)
     return w #w_1
 
@@ -72,32 +94,41 @@ def fit_regression(X,Y):
 def main():
     # Load the data
     X, y, features = load_data()
-    
+    xrows = X.shape[1]
+
     print("Features: {}".format(features))
     
     # Visualize the features
     visualize(X, y, features)
     
     #TODO: Split data into train and test
-    
+    X = np.concatenate((np.ones((506,1)),X),axis=1) #add constant one feature - no bias needed
+
     # Fit regression model
-    w = fit_regression(X, y)
+    
+    training_x, testing_x, training_y, testing_y  = split_data_8020(X, y)
+    
+    #print "train x ", training_x.shape[1] #shape 0 is 1, shape 1 is 405
+    #print "train y ", training_y.shape[0] #shape 0 is 405
+    #print "test x ", test_x.shape[1] #shape 0 is 1, shape 1 is 101
+    #print "test y ", test_y.shape[0] #shape 0 is 101
+    w = fit_regression(training_x, training_y)
     #print w
 
     # Compute fitted values, MSE, etc.
     
-    y_hat = np.dot(X, w)
+    y_hat = np.dot(testing_x, w)
     #print "y_hat ", y_hat
     #print "y ", y
     
     #MSE
-    mse = ((y_hat - y) **2).mean(axis = 0)
-    #print mse
+    mse = ((y_hat - testing_y) **2).mean(axis = 0)
+    print mse
     
     #another two error measures: 
         #mean norm, mean root
-    mnorm = np.absolute(y_hat - y)
-    #print mnorm
+    mnorm = np.absolute(y_hat - testing_y)
+    print mnorm
     
     
         

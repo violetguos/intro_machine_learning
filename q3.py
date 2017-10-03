@@ -53,7 +53,7 @@ def load_data_and_init_params():
     features = X.shape[1]
 
     # Initialize w
-    w = np.random.randn(features)
+    w = np.random.randn(features) #w is ndarray
 
     print("Loaded...")
     print("Total data points: {0}\nFeature count: {1}".format(X.shape[0], X.shape[1]))
@@ -78,7 +78,15 @@ def lin_reg_gradient(X, y, w):
     '''
     Compute gradient of linear regression model parameterized by w
     '''
-    raise NotImplementedError()
+    xTrans = np.transpose(X)
+    for i in range(len(y)):
+        print "len y", len(y)
+        y_hat = np.dot(X, w)
+        loss_square = (y - y_hat)**2
+        loss_cos = (y, y_hat)
+        grad = np.dot(xTrans, loss) / len(y)
+        w = w - grad
+    return w
 
 def main():
     # Load data and randomly initialise weights
@@ -87,9 +95,15 @@ def main():
     batch_sampler = BatchSampler(X, y, BATCHES)
 
     # Example usage
-    X_b, y_b = batch_sampler.get_batch()
-    batch_grad = lin_reg_gradient(X_b, y_b, w)
-
+    #for K  = 500
+    k = 500
+    m = 50
+    X_b, y_b = batch_sampler.get_batch(m)
+    #batch_grad = lin_reg_gradient(X_b, y_b, w)
+    #true_grad = lin_reg_gradient(X, y, w)
+    #print batch_grad
+    #print true_grad
+    
 
 if __name__ == '__main__':
     main()

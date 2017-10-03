@@ -18,7 +18,8 @@ N = x.shape[0]
 x = np.concatenate((np.ones((506,1)),x),axis=1) #add constant one feature - no bias needed
 d = x.shape[1]
 y = boston['target']
-
+print (d)
+#print (y.shape[0])
 idx = np.random.permutation(range(N))
 
 #helper function

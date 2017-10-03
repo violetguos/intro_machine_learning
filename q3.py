@@ -74,19 +74,21 @@ def cosine_similarity(vec1, vec2):
     return dot / (sum1 * sum2)
 
 #TODO: implement linear regression gradient
-def lin_reg_gradient(X, y, w):
+def lin_reg_gradient(X, y, w, m):
     '''
     Compute gradient of linear regression model parameterized by w
     '''
     xTrans = np.transpose(X)
-    for i in range(len(y)):
-        print "len y", len(y)
-        y_hat = np.dot(X, w)
-        loss_square = (y - y_hat)**2
-        loss_cos = (y, y_hat)
-        grad = np.dot(xTrans, loss) / len(y)
-        w = w - grad
-    return w
+    gradsum = 0
+    for i in range(0, m):
+        xtx = np.dot(xTrans, X)
+        xtxw =2*np.dot(xtx, w)
+        xty = 2*np.dot(xTrans, y)
+        grad = xtxw - xty
+        gradsum += grad
+    
+    gradient = gradsum /m
+    return gradient
 
 def main():
     # Load data and randomly initialise weights
@@ -99,9 +101,21 @@ def main():
     k = 500
     m = 50
     X_b, y_b = batch_sampler.get_batch(m)
-    #batch_grad = lin_reg_gradient(X_b, y_b, w)
-    #true_grad = lin_reg_gradient(X, y, w)
+    #for i in range(0,k):
+    batch_grad = lin_reg_gradient(X_b, y_b, w, m)
+    true_grad = lin_reg_gradient(X, y, w, len(y))
     #print batch_grad
+    
+    #varience
+    w_j = []
+    for i in range(0,k):
+        for m in range(1, 400):
+            batch_grad = lin_reg_gradient(X_b, y_b, w, m)
+            w_j.append(batch_grad)
+    
+    print "average" , reduce(lambda x, y: x + y, w_j) / len(w_j)
+
+    
     #print true_grad
     
 

@@ -113,7 +113,7 @@ def main():
     #print "test x ", test_x.shape[1] #shape 0 is 1, shape 1 is 101
     #print "test y ", test_y.shape[0] #shape 0 is 101
     w = fit_regression(training_x, training_y)
-    #print w
+    print w
 
     # Compute fitted values, MSE, etc.
     
@@ -121,25 +121,44 @@ def main():
     #print "y_hat ", y_hat
     #print "y ", y
     
-    #MSE
+    #Mm
+    
     mse = ((y_hat - testing_y) **2).mean(axis = 0)
-    print mse
+    
+    #print "train mse", train_mse
+    print "mse", mse
     
     #another two error measures: 
         #mean norm, mean root
     mnorm = np.absolute(y_hat - testing_y)
+    #TO DO
     #print mnorm
     
     #feacture selection
     print "-----feature ranking----"
-    for i in range(len(X[1])):
+    for i in range(1, len(X[1])-1):
         y_hat = np.dot(X[:,i], w[i]) #this is 506 instances
         #print y_hat
         #print len(X[:,i])
         mse = ((y_hat - y[i]) **2).mean()
-        print "%s, %f ", features[i], mse
+        print '%s, %f ', features[i], mse
         
-
+        '''
+        19.1260574753
+        -----feature ranking----
+        %s, %f  ZN 484.413688573
+        %s, %f  INDUS 1167.93253171
+        %s, %f  CHAS 1099.4260966
+        %s, %f  NOX 1296.12240787
+        %s, %f  RM 1503.03007542
+        %s, %f  AGE 13.3927241703
+        %s, %f  DIS 699.634285002
+        %s, %f  RAD 494.827199307
+        %s, %f  TAX 273.13255436
+        %s, %f  PTRATIO 360.690295753
+        %s, %f  B 1211.11481317
+        %s, %f  LSTAT 325.90073992
+        '''
 if __name__ == "__main__":
     main()
 

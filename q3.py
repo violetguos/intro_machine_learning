@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.datasets import load_boston
+import matplotlib.pyplot as plt
+
 
 BATCHES = 50
 
@@ -80,32 +82,73 @@ def lin_reg_gradient(X, y, w):
     '''
     xTrans = np.transpose(X)
     xtx = np.dot(xTrans, X)
-    xtxw =2*np.dot(xtx, w)
-    xty = 2*np.dot(xTrans, y)
-    grad = xtxw - xty
+    xtxw =np.dot(xtx, w)
+    xty = np.dot(xTrans, y)
+    grad = 2*xtxw - 2*xty
     
     return grad
 
-def grad_var_m(x,y,w,m,k):
-    for i in range(0,k):
-        w_j = []
-
-        for m in range(1, 400):
-            batch_grad = lin_reg_gradient(X_b, y_b, w)
-            w_j.append(batch_grad)
-            
-        print "average" , (reduce(lambda x, y: x + y, w_j) / len(w_j))
-
-
-def grad_500(x, y, w, k):
-    grad_sum =0
-    for i in range(0,k):
-        batch_grad = lin_reg_gradient(x, y, w)
-        grad_sum +=batch_grad
+def var_grad (x):
+    sum_x = 0
+    for i in range(len(x)):
+        sum_x += x[i]
     
+    avg_x = sum_x /float(len(x))
+    
+    sum_x2 = 0
+    for i in range(len(x)):
+        sum_x2+=(x[i] - avg_x)**2
+    
+    var_x = sum_x2 / float(len(x))
+    return var_x
+
+def square_metric(grad, grad_true):
+    diff = grad - grad_true
+    dist = np.dot(diff, diff)
+
+    return diff
+
+
+            
+        #print "average" , (reduce(lambda x, y: x + y, w_j) / len(w_j))
+
+
+def grad_500(x, y, w, m, k, sampler):
+    grad_sum =0
+    batch_sum = 0
+    batch_avg =0
+    for i in range(0,k):
+        X_b, y_b = sampler.get_batch(m)
+        #print len(X_b)
+        for j in range(m):
+            batch_grad = lin_reg_gradient(X_b[j], y_b[j],w)
+            batch_sum += batch_grad
+        batch_avg = batch_sum/m
+    grad_sum +=batch_avg
+        #print "batch_grad ", batch_grad
+        #print "grad", grad_sum
+        
     b_grad = grad_sum / k
-    print batch_grad  
+    print "b_grad", b_grad  
     return b_grad
+
+def grad_real(x, y, w):
+
+    real_grad = lin_reg_gradient(x, y, w)
+    print "real grad ", real_grad
+    #grad_sum +=batch_grad
+    
+    #b_grad = grad_sum / k
+    #print batch_grad  
+    return real_grad
+
+def plot_log(m, sigma):
+    print "----plotint var---"
+    plt.plot(m, sigma)
+    
+    plt.yscale('log')
+    plt.show()
+    
 
 def main():
     # Load data and randomly initialise weights
@@ -117,18 +160,39 @@ def main():
     #for K  = 500
     k = 500
     m = 50
-    X_b, y_b = batch_sampler.get_batch(m)
-    batch_grad = grad_500(X_b, y_b, w, k)
-    print "final avg,", batch_grad
-    true_grad = lin_reg_gradient(X, y, w)
-
+    batch_grad = grad_500(X, y, w, m, k, batch_sampler)
+    #print "final avg,", batch_grad
+    true_grad = grad_real(X, y, w) #BUG!!!!!
     
+    #compute diff
+    diff_sq = square_metric(batch_grad, true_grad)
+    diff_cos = cosine_similarity(batch_grad, true_grad)
+    #print "diff_sq", diff_sq
+    #print "diff cos", diff_cos    
     #varience
     
+    #b_m_grad = []
+    sigma = []
+    for m1 in range(1,401):
+        X_b, y_b = batch_sampler.get_batch(m1)
+        b_m = grad_500(X_b, y_b, w, m1, k, batch_sampler)
+        sigma_per = var_grad(b_m)
+        #print "sig per", sigma_per
+        sigma.append(sigma_per)
+        
+    #print "sigma ", sigma
+
+    
+    #reinit m for plotting
+    m1 = np.logspace(1,3, 400)
+    print type(m1)
+    plot_log(m1, sigma)
+    
+    
     
 
     
-    print true_grad
+    #print true_grad
     
     '''
     [   905147.49317521   1938519.97649744   2407949.76862212 ...,

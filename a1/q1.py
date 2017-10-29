@@ -71,12 +71,11 @@ def split_data_8020(X, Y):
     return trainingSetX, testSetX,\
              trainingSetY, testSetY
 
-def tabulate_weight(w, x):
-    for i in range(len(x)):
-        for a, b in zip(w,x[i]):
-            #print "{}\t{}".format(repr(a),repr(b))
-            c =1 #dummy
-    plt.show()
+#def tabulate_weight(w, x):
+#    for i in range(len(x)):
+#        for a, b in zip(w,x[i]):
+#            print "{}\t{}".format(repr(a),repr(b))
+            
 
 def fit_regression(X,Y):
     #TODO: implement linear regression
@@ -85,7 +84,7 @@ def fit_regression(X,Y):
     xty = np.dot(np.transpose(X), Y)
     w = np.linalg.solve(xtx, xty)
     #print type(w)
-    tabulate_weight(w, X)
+    #Wtabulate_weight(w, X)
     return w #w_1
 
 
@@ -107,14 +106,12 @@ def main():
     # Fit regression model
     
     training_x, testing_x, training_y, testing_y  = split_data_8020(X, y)
-    
     #print "train x ", training_x.shape[1] #shape 0 is 1, shape 1 is 405
     #print "train y ", training_y.shape[0] #shape 0 is 405
     #print "test x ", test_x.shape[1] #shape 0 is 1, shape 1 is 101
     #print "test y ", test_y.shape[0] #shape 0 is 101
     w = fit_regression(training_x, training_y)
-    print w
-
+    
     # Compute fitted values, MSE, etc.
     
     y_hat = np.dot(testing_x, w)
@@ -123,42 +120,25 @@ def main():
     
     #Mm
     
-    mse = ((y_hat - testing_y) **2).mean(axis = 0)
+    mse = ((y_hat - testing_y) **2).mean()
     
     #print "train mse", train_mse
     print "mse", mse
     
     #another two error measures: 
         #mean norm, mean root
-    mnorm = np.absolute(y_hat - testing_y)
+    mnorm = sum(np.absolute(y_hat - testing_y))
+    root_mean_err = np.sqrt(((sum(y_hat - testing_y)) **2) / (len(y_hat)))
+    
     #TO DO
-    #print mnorm
+    print "----Two extra error measurements:---" 
+    print "normal error", mnorm
+    print "mean square root" , root_mean_err
     
     #feacture selection
     print "-----feature ranking----"
-    for i in range(1, len(X[1])-1):
-        y_hat = np.dot(X[:,i], w[i]) #this is 506 instances
-        #print y_hat
-        #print len(X[:,i])
-        mse = ((y_hat - y[i]) **2).mean()
-        print '%s, %f ', features[i], mse
-        
-        '''
-        19.1260574753
-        -----feature ranking----
-        %s, %f  ZN 484.413688573
-        %s, %f  INDUS 1167.93253171
-        %s, %f  CHAS 1099.4260966
-        %s, %f  NOX 1296.12240787
-        %s, %f  RM 1503.03007542
-        %s, %f  AGE 13.3927241703
-        %s, %f  DIS 699.634285002
-        %s, %f  RAD 494.827199307
-        %s, %f  TAX 273.13255436
-        %s, %f  PTRATIO 360.690295753
-        %s, %f  B 1211.11481317
-        %s, %f  LSTAT 325.90073992
-        '''
+    for i in range(len(w)):
+        print features[i], w[i] #"feature", elem 
 if __name__ == "__main__":
     main()
 

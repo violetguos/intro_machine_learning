@@ -11,6 +11,13 @@ np.random.seed(0)
 from scipy.misc import logsumexp
 
 
+######################################################
+# This is a program that performs k fold validatinon #
+# and Locally reweighted least squares               #
+######################################################
+
+
+
 # load boston housing prices dataset
 boston = load_boston()
 x = boston['data']
@@ -18,8 +25,6 @@ N = x.shape[0]
 x = np.concatenate((np.ones((506,1)),x),axis=1) #add constant one feature - no bias needed
 d = x.shape[1]
 y = boston['target']
-print (d)
-#print (y.shape[0])
 idx = np.random.permutation(range(N))
 
 #helper function
@@ -50,12 +55,12 @@ def run_on_fold(x_test, y_test, x_train, y_train, taus):
     for j,tau in enumerate(taus):
         predictions =  np.array([LRLS(x_test[i,:].reshape(d,1),x_train,y_train, tau) \
                         for i in range(N_test)])
-        losses[j] = ((predictions-y_test)**2).mean()
-    print("losses")
+        losses[j] = ((predictions.flatten()-y_test.flatten())**2).mean()
+
+    print("Running on 1 of k folds")
     return losses
  
  
-#to implement
 def LRLS(test_datum,x_train,y_train, tau,lam=1e-5):
     '''
     Input: test_datum is a dx1 test vector
@@ -71,8 +76,7 @@ def LRLS(test_datum,x_train,y_train, tau,lam=1e-5):
     #a_ii_denom_sum = np.matrix([]) #store dist matrix N by d
     a_ii_denom = [] #store the log sum over j
     a_ii = [] #the Array that stores each exp over exp sum
-    #print("test datum", np.shape(test_datum))
-    #print("x_train", np.shape(x_train))
+
     
     x_x_dist = l2(np.transpose(test_datum), x_train) #N_train by d matrix
     #print ("x x dist. ", x_x_dist.shape())
@@ -83,21 +87,13 @@ def LRLS(test_datum,x_train,y_train, tau,lam=1e-5):
     #print("cols", cols)
     
     #sum over the column 
-    #for i in range (0, rows):
-       # a_ii_denom_arr = np.array([]) #re init for each i
+
     for j in range(0, cols):
         #append all the column values
         a_ii_denom_arr.append(- x_x_dist[0][j]/ (2 * tau**2))
     
     a_ii_denom_arr = np.array(a_ii_denom_arr)
     
-    #print (type(a_ii_denom_arr)) #1 by 304
-    
-        #add the column values to the matrix
-    
-    #print ("aii arr", np.shape(a_ii_denom_arr))
-    
-        #sum each row in aii_denom_sum
     a_ii_denom_log = logsumexp(a_ii_denom_arr)
     a_ii_denom.append(np.exp(a_ii_denom_log))
     
@@ -108,14 +104,8 @@ def LRLS(test_datum,x_train,y_train, tau,lam=1e-5):
         a_ii.append(a_ii_nom / a_ii_denom)
     
     a_ii = np.array(a_ii)
-    #print (a_ii)
-    #print ("aii dim", np.shape(a_ii))
-    Aii = np.diagflat(a_ii) #A must be N by N, 304 by 304
-    #print ("Aii dim", np.shape(Aii))
-
-    
-    
-    
+    Aii = np.diagflat(a_ii) #A must be N by N
+  
     #w∗ = XTAX+λI −1XTAy, (xtax + I)w = Xtay
     lam_i = lam * np.identity(len(x_train[1])) #lambda times I
     #print("lami", np.shape(lam_i))
@@ -138,27 +128,17 @@ def partition_k(x, y, num, i):
     '''
     returns x_train, x_test, y_train, y_test
     '''
-    #print("part x, ",np.shape(x))
-    #print("part y, ", np.shape(y))
-    
-    #print ("num = ", num)
-    #print ("i=", i)
+
     x_test = x[(i*num):((i+1)*num):,] #select the test bit
-    #print ("x_test", np.shape(x_test))
     A= x[0:(i*num),:]
-    #print("len a", len(A))
     B = x[((i+1)*num): ,: ]   
-    #print ("B shape", np.shape(B))
     
     if len(A) ==0:
         x_train = B
     else:
         x_train = np.concatenate((A, B), axis =0) #select the rest 304x14
-    #print (np.shape(x_train))   
     y_test = y[(i*num):((i+1)*num)] #select elems from array
     y_train  = np.concatenate([y[0:(i)*num], y[(i+1)*num:]]) #select the rest 304
-    #print(len(y_test))
-    #print("y len = ", len(y_train))
     
     return x_test, y_test, x_train, y_train
 
@@ -180,50 +160,53 @@ def run_k_fold(x,y,taus,k):
         losses.append(per_losses)
         
     
-    #print ("losses dim in k fold,", losses)
     return np.array(losses)
-    ## TODO
-def average_ith(losses):
-    rows = len(losses[1]) #should be 5
-    cols = len(losses[0])
-    sum_list = []
-    for i in range(0, cols):
-        sum1 = 0
-        for j in range(0, rows):
-            sum1 +=losses[i][j]
-        sum1 = sum1/rows
-        sum_list.append(sum1)
-    
-    return np.array(sum_list)
+
+
+#def average_ith(losses):
+#    rows = len(losses[1]) #should be 5
+#    cols = len(losses[0])
+#    sum_list = []
+#    for i in range(0, cols):
+#        sum1 = 0
+#        for j in range(0, rows):
+#            sum1 +=losses[i][j]
+#        sum1 = sum1/rows
+#        sum_list.append(sum1)
+#    
+#    return np.array(sum_list)
     
 
 def average_loss_per_tau(losses):
-    for i in len(losses[0]):
-        
-        for j in len(losses[0]):
-            return 0
+    '''
+    Average loss of a given tau value
+    '''
+    avg_list = []
+    for i in range(len(losses[0])):
+        sum_tau = 0
+        for j in range(0, 5):
+            sum_tau += losses[j][i]
+        avg = sum_tau / float(5)
+        avg_list.append(avg)
+    return avg_list
 
 if __name__ == "__main__":
-    # In this excersice we fixed lambda (hard coded to 1e-5) and only set tau value. Feel free to play with lambda as well if you wish
-    
+    # In this excersice we fixed lambda (hard coded to 1e-5) and only set tau value.
+    # Feel free to play with lambda as well if you wish
+    print ("--------Loading and Computing--------------")
     taus = np.logspace(1,3,400)
     losses = run_k_fold(x,y,taus,k=5)
-   
+
     
-    #minlosses = np.array(minlosses)
     for i in range(0,5):
         plt.plot(taus, losses[i])
+    
+    plt.ylabel("losses")
+    plt.xlabel("taus")
+    plt.show()
+    
+    loss_avg = average_loss_per_tau(losses)
+    plt.plot(taus, loss_avg)
     plt.show()
 
-    plt.yscale('log')
-    plt.ylabel("taus")
-    plt.xlabel("losses")
-    
-    #average the ith item in each list
-    
-    
-    plt.show()
-
-    print("min loss = {}".format(losses.min()))
-
-    #min loss = 63.9109756781
+    print("min loss = {}".format(np.array(loss_avg).min()))

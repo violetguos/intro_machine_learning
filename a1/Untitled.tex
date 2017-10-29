@@ -6,7 +6,7 @@
 \usepackage[T1]{fontenc}
 
 %% Sets page size and margins
-\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage[letterpaper,top=2.5cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
 
 %% Useful packages
 \usepackage{amsmath}
@@ -35,19 +35,134 @@
 \section{Learning basics of regression in Python }
 
 \subsection{Describe and summarize the data}
+Dimension: 13\\
+Target: price\\
+Data points: for each feature, we have 506 data points
 
-\subsubsection{data points, dimensions, target}
-The target is the house price. The data points have a dimension of 
+\subsection{visualization}
+\subsection{}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{Figure_1.png}
+\caption{\label{fig:q1}}
+\end{figure}
 
-\subsubsection{weighted least square problem and analytic solution proof}
+
+\subsubsection{Feature weights}
+
+
+Weights of each feature: \\
+\begin{center}
+\begin{tabular}{ |c|c| } 
+ \hline
+CRIM  & 39.3306546864 \\
+ZN & -0.105570660997\\
+INDUS  & 0.033569463917\\
+CHAS & 0.0501338462503\\
+NOX & 2.44159672082\\
+RM  &-18.9563291605\\
+AGE  & 3.65717113479\\
+DIS & 0.00193877592741\\
+RAD  & -1.46699325228\\
+TAX & 0.349594800713\\
+PTRATIO  &-0.0145786907583\\
+B & -0.959592750851\\
+LSTAT & 0.008452561222\\
+ \hline
+\end{tabular}
+\end{center}
+INDUS matches my expectation. The more business we have, the more prosperous an area is, therefore more expensive housing.
+
+\subsubsection{MSE of my model}
+19.0490487755
+
+\subsubsection{Two more error measurement}
+
+normal error = 313.546384855\\
+mean square root= 0.281596677525\\
+I suggest these two error measurements because they do not square the differences.
+
+
+\subsubsection{Most significant feature}
+Based on my results, the most significant feature is RM and CRIM. It has larger weight value among all features.
+ 
+
+
+
+%%%%%%%%Q 2%%%%%%%%%%%
+\section{Locally weighted regression}
+
+\subsection{weighted least square problem and analytic solution proof}
 Since the matrix A is diagonal and $\hat{y} =A^T x$ and $L(w) = \frac{1}{2} \Sigma a^{(i)}(y^{(i)} - W^T x^{(i)} )^{2} + \frac{\lambda}{2} \lVert W \rVert ^{2}$ \\
 $ L(w) = \frac{1}{2} A [(y - W^T x)(y - W^T x)] + \frac{\lambda}{2} \lVert W \rVert ^{2}$\\
 $ L(w) = \frac{1}{2} A (y^T y + W^T X^T XW -2W^T  X^T y) +\frac{\lambda}{2}  \lVert W \rVert ^{2}$\\
-$ \frac{\partial}{\partial{w}} =\frac{1}{2} \times 2 A[X^T X W^{*} - X^T y] + \lambda \lVert W \rVert ^{2} = 0$\\
+$ \frac{\partial}{\partial{w}} =\frac{1}{2} \times 2 A[X^T X W^{*} - X^T y] + \lambda \lVert W \rVert = 0$\\
 $A X^T X W^{*} - X^T Ay + \lambda W^{*} = 0 $\\
 $(A X^T X + \lambda)W^{*} = X^T Ay  $\\
 $W^{*} = X^T Ay (A X^T X + \lambda I)^{-1} $
 
+
+\subsection{}
+x is Tau, y is losses
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{q2_final.png}
+\caption{\label{fig:q2}}
+\end{figure}
+
+\subsection{}
+The algorithm produces results or weights of each feature with a large variance if $\tau$ -> 0,  and
+ variance -> constant if $\tau $-> $\inf$
+ 
+ %%%%%%%%%%%% Q3%%%%%%%%%%%%%
+\section{Mini-batch}
+\subsection{Proof of expected value of mini batches}
+$RHS = \frac{1}{n} \Sigma_{i=1}^{n}a_{i}$ is the average of all samples in the data set\\
+LHS: $ \frac{1}{m}  \Sigma_{i=1}^{m} a_{i} $ is the average of each random batch. Since each batch is drown randomly from the dataset, the m elements each have $ \frac{1}{n}$ chance to be drawn. The probability of the batch is $ \frac{m}{n}$. $E(\frac{1}{m} \Sigma  a_{i}) = \frac{m}{n} \times  \frac{1}{m} \Sigma  a_{i} = \frac{1}{n} \Sigma_{i=1}^{n} a_{i} $ \\
+QED
+
+\subsection{Proof of gradients}
+From the result of part 1,  substitute $l$ into $a_{i}$\\
+$E[ \frac{1}{m} \Sigma l(x ,y,  \theta)  ] = \frac{1}{n} \Sigma l(x ,y, \theta) $\\
+$E[L(x, y, \theta)] = L(x ,y, \theta)$\\
+apply gradient, we have \\
+$\nabla E[L(x, y, \theta)] =\nabla L(x ,y, \theta) =  \frac{1}{n} \Sigma_{i=1}^{n} \nabla l $\\
+$\nabla \frac{1}{n} \Sigma_{i=1}^{n} l  = \nabla E(\frac{1}{m} \Sigma  a_{i}) $ \\
+$E[ \nabla L(x, y, \theta)] = \nabla L(x, y, \theta) $
+
+\subsection{Importance of this result}
+This implies that k random batches of data can approximate the gradient of the complete dataset.
+
+\subsection{Gradient}
+\subsubsection{Analytic solution}
+$\nabla L = 2X^TXw - 2X^Ty$
+\subsubsection{}
+see q3.py
+
+\subsection{Error measurements}
+square metric = 79165708.6263 \\
+cosine similarity =  0.999998432222\\
+I suggest cosine similarity because square distance takes the difference to the power of 2, which punishes certain cases more. 
+
+ 
+\subsection{plot}
+X axis is weights, y axis is log of M
+
+this is the graph if we average all the weights
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{q3_final.png}
+\caption{\label{}}
+\end{figure}
+
+This is the graph if we average each $w_{j}$
+X axis is weights, y axis is log of M
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{q3_f2.png}
+\caption{\label{fig:q3}}
+\end{figure}
 
 
 

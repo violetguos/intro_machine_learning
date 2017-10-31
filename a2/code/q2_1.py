@@ -8,7 +8,7 @@ import data
 import numpy as np
 # Import pyplot - plt.imshow is useful!
 import matplotlib.pyplot as plt
-
+from sklearn.model_selection import KFold
 
 class KNearestNeighbor(object):
     '''
@@ -47,38 +47,30 @@ class KNearestNeighbor(object):
         You should return the digit label provided by the algorithm
         '''
         labels = [float(i) for i in range(0,10)]
-        print "labels", labels
-        kNearest = np.zeros(k)
-        distances = []
-        
-        distances.append(self.l2_distance(test_point))
-        distances = np.asarray(distances[0]) 
-        print distances
-        k_idx = [] #indices of the k smallest in distance
-        k_idx = distances.argsort()[:k]
-        
-        for i in range(0,k):
-            kNearest[i] = distances[k_idx[i]]
-        
-        #vote
-        #TODO
+        distances = np.array(self.l2_distance(test_point))
+        #distances = np.asarray(distances[0]) 
+        #print "distace", distances
+         #indices of the k smallest in distance
+        k_idx = np.array((distances.argsort()[:k]))
+        #k_idx = np.asarray(k_idx[0]) #conver to a ndarray
+        #print "k idx", k_idx
+        #build a hash table of label/digit to counts
+        #a list [] of tuple(label, count)
         label_count = np.zeros(10)
         #index is the label, number is # of instance in k Neighbours
         for j in k_idx:
             for i in range(len(labels)):
+                #print "train label j", self.train_labels[j], j
                 if self.train_labels[j] == labels[i]:
                     label_count[i] +=1
         
-        print "label count", label_count
-
-        
-        #build a hash table of label/digit to counts
-        #a list [] of tuple(label, count)
-        
-            
+        #print "label count", label_count
                 
+        #if label_count.max() > k//2: #randomly pick the frist occuranace
+        max_label_idx = label_count.argmax()
+        #print "mac label", max_label_idx
+        digit = float(max_label_idx)
 
-        
         return digit
 
 def cross_validation(knn, k_range=np.arange(1,15)):
@@ -86,6 +78,13 @@ def cross_validation(knn, k_range=np.arange(1,15)):
         # Loop over folds
         # Evaluate k-NN
         # ...
+        kf = KFold(n_splits=10)
+        for train_index, test_index in kf.split(knn.train_data):
+            x_train, x_test = knn.train_data[train_index], knn.train_data[test_index]
+            y_train, y_test = knn.train_labels[train_index], knn.train_labels[test_index]
+            knn_new = KNearestNeighbor(x_train, y_train)
+            k_accuracy = classification_accuracy(knn_new ,k, x_test, y_test)
+            #accuracy = self.
         pass
 
 def classification_accuracy(knn, k, eval_data, eval_labels):
@@ -93,15 +92,39 @@ def classification_accuracy(knn, k, eval_data, eval_labels):
     Evaluate the classification accuracy of knn on the given 'eval_data'
     using the labels
     '''
-    pass
+  
+    knn_labels = [] 
+    for col in eval_data:
+        #col is 64 vector
+        knn_labels.append((knn.query_knn(col, k)))
+        
+    
+    #print "knn_labels clasojsaires", type(knn_labels)
+    cnt_total = len(eval_labels)
+    cnt_accurate = 0
+    for j in range(len(eval_labels)):
+        if eval_labels[j] == knn_labels[j]:
+            cnt_accurate +=1
+            
+    return float(cnt_accurate) / float(cnt_total)
+    
+        
 
 def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
     #print "lenlnelne",len(train_labels)  = 7000, labels are floats
     knn = KNearestNeighbor(train_data, train_labels)
 
-    # Example usage:
-    predicted_label = knn.query_knn(test_data[0], 1)
 
+    #===========Q1,2--------#
+    #k_1_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
+    #k_15_accuracy = classification_accuracy(knn, 15, test_data, test_labels)
+    #print "k 1", k_1_accuracy
+    
+    #print "k 15.", k_15_accuracy
+    
+    #-----------------Q3---------------#
+    
+    
 if __name__ == '__main__':
     main()

@@ -9,6 +9,7 @@ import numpy as np
 # Import pyplot - plt.imshow is useful!
 import matplotlib.pyplot as plt
 
+
 class KNearestNeighbor(object):
     '''
     K Nearest Neighbor classifier
@@ -38,13 +39,46 @@ class KNearestNeighbor(object):
         dist = self.train_norm + test_norm - 2*self.train_data.dot(test_point.transpose())
         return np.squeeze(dist)
 
+    
     def query_knn(self, test_point, k):
         '''
         Query a single test point using the k-NN algorithm
 
         You should return the digit label provided by the algorithm
         '''
-        digit = None
+        labels = [float(i) for i in range(0,10)]
+        print "labels", labels
+        kNearest = np.zeros(k)
+        distances = []
+        
+        distances.append(self.l2_distance(test_point))
+        distances = np.asarray(distances[0]) 
+        print distances
+        k_idx = [] #indices of the k smallest in distance
+        k_idx = distances.argsort()[:k]
+        
+        for i in range(0,k):
+            kNearest[i] = distances[k_idx[i]]
+        
+        #vote
+        #TODO
+        label_count = np.zeros(10)
+        #index is the label, number is # of instance in k Neighbours
+        for j in k_idx:
+            for i in range(len(labels)):
+                if self.train_labels[j] == labels[i]:
+                    label_count[i] +=1
+        
+        print "label count", label_count
+
+        
+        #build a hash table of label/digit to counts
+        #a list [] of tuple(label, count)
+        
+            
+                
+
+        
         return digit
 
 def cross_validation(knn, k_range=np.arange(1,15)):
@@ -63,6 +97,7 @@ def classification_accuracy(knn, k, eval_data, eval_labels):
 
 def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
+    #print "lenlnelne",len(train_labels)  = 7000, labels are floats
     knn = KNearestNeighbor(train_data, train_labels)
 
     # Example usage:

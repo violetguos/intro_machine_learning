@@ -131,8 +131,12 @@ def main():
     #print "k 15.", k_15_accuracy
     
     #-----------------Q3---------------#
-    opti_k = cross_validation(knn)
-    print opti_k
+    #opti_k_index = cross_validation(knn)
+    #k1_accuracy is the highest
+    k_1_test_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
+    k_1_train_accuracy = classification_accuracy(knn, 1, train_data, train_labels)
+    print k_1_test_accuracy
+    print k_1_train_accuracy
     
 if __name__ == '__main__':
     main()

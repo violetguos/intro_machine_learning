@@ -74,18 +74,25 @@ class KNearestNeighbor(object):
         return digit
 
 def cross_validation(knn, k_range=np.arange(1,15)):
+    all_k = []
     for k in k_range:
         # Loop over folds
         # Evaluate k-NN
         # ...
         kf = KFold(n_splits=10)
+        k_train_accuracy = []
         for train_index, test_index in kf.split(knn.train_data):
             x_train, x_test = knn.train_data[train_index], knn.train_data[test_index]
             y_train, y_test = knn.train_labels[train_index], knn.train_labels[test_index]
             knn_new = KNearestNeighbor(x_train, y_train)
-            k_accuracy = classification_accuracy(knn_new ,k, x_test, y_test)
-            #accuracy = self.
-        pass
+            k_train_accuracy.append(classification_accuracy(knn_new ,k, x_test, y_test))
+        k_accuracy = (1.0 *sum(k_train_accuracy)) / (1.0 *len(k_train_accuracy))   
+        all_k.append(k_accuracy)
+    print all_k
+    all_k = np.array(all_k)
+    optimal_k = all_k.argmax()
+    return optimal_k
+    
 
 def classification_accuracy(knn, k, eval_data, eval_labels):
     '''
@@ -124,7 +131,8 @@ def main():
     #print "k 15.", k_15_accuracy
     
     #-----------------Q3---------------#
-    
+    opti_k = cross_validation(knn)
+    print opti_k
     
 if __name__ == '__main__':
     main()

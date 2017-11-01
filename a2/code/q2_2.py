@@ -9,16 +9,61 @@ import numpy as np
 # Import pyplot - plt.imshow is useful!
 import matplotlib.pyplot as plt
 
+
+def unblockshaped(arr, h, w):
+    """
+    Return an array of shape (h, w) where
+    h * w = arr.size
+
+    If arr is of shape (n, nrows, ncols), n sublocks of shape (nrows, ncols),
+    then the returned array preserves the "physical" layout of the sublocks.
+    """
+    n, nrows, ncols = arr.shape
+    return (arr.reshape(h//nrows, -1, nrows, ncols)
+               .swapaxes(1,2)
+               .reshape(h, w))
+
+
+def mean_i_digit(i_digits):
+    
+    '''returns the mean for one digit,
+        avg across 700 samples for 64 pixels
+        i_digit is ndarray
+    '''
+    i_mean = np.zeros(64)
+    i_sum = np.sum(i_digits, axis = 0)
+    for i in range(0,64):
+        i_mean[i]=i_sum[i]/700.0
+    
+    #print i_mean
+    return i_mean
+
+        
+
 def compute_mean_mles(train_data, train_labels):
     '''
     Compute the mean estimate for each digit class
 
     Should return a numpy array of size (10,64)
     The ith row will correspond to the mean estimate for digit class i
+    train_data: 7000 by 64
+    train_labels: 7000
     '''
     means = np.zeros((10, 64))
-    # Compute means
+    
+    for i in range(0, 10):
+        i_mean_matrix = np.zeros((8,8))
+        i_digits = data.get_digits_by_label(train_data, train_labels, i)
+        # Compute mean of class i
+        #TODO: compute 64 by 64 matrix mean??
+        #700 row, 64 columns for each difit
+
+        means[i] = mean_i_digit(i_digits) #imean is 64
+
     return means
+
+
+def var_
 
 def compute_sigma_mles(train_data, train_labels):
     '''
@@ -29,6 +74,9 @@ def compute_sigma_mles(train_data, train_labels):
     '''
     covariances = np.zeros((10, 64, 64))
     # Compute covariances
+    
+    
+    
     return covariances
 
 def plot_cov_diagonal(covariances):
@@ -44,6 +92,8 @@ def generative_likelihood(digits, means, covariances):
 
     Should return an n x 10 numpy array 
     '''
+    
+    
     return None
 
 def conditional_likelihood(digits, means, covariances):
@@ -84,7 +134,6 @@ def main():
     # Fit the model
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
-
     # Evaluation
 
 if __name__ == '__main__':

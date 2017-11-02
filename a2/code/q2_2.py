@@ -64,43 +64,35 @@ def compute_mean_mles(train_data, train_labels):
     return means
 
 
-def var_vector(v1):
-    '''
-    v1 is ndarray
-    return a number var
-    '''
-    mean = np.mean(v1)
-    sum_mean_diff = 0
-    for i in range(len(v1)):
-        sum_mean_diff += (v1[i] - mean) **2
-    var_v1 = (1.0*sum_mean_diff) / (1.0 *len(v1))
-    print "var_v1", var_v1, v1
-    print "np var v1", np.var(v1)
-    return var_v1
-
 def expected_vector(v1):
-    prob = 1.0 / (1.0*(len(v1)))
+    len_v1 = 1.0* len(v1)
     
-    expect_val = sum(v1) * prob  
-    print "v1", v1
-    print  "prob", prob
-    print "exp val", expect_val
+    prob = 1.0 / (len_v1)
+    temp_sum = 0
+    for i in range(len(v1)):
+         temp_sum += v1[i]
+    
+    expect_val = temp_sum *prob
     return expect_val
     
 
-def cov_vectors(v1, v2):
+def cov_vector(v1):
     '''
-    v1, v2: 2 arrays
-    return a number covariance
+    calcs sqrt(v1 - mean)**2 / 2
+    return a component of covar
     '''
+    
     e_v1 = expected_vector(v1)
-    e_v2 = expected_vector(v2)
-    #v1_min_e_v1 = [i - e_v1 for i in v1]
-    #v2_min_e_v2 = [j - e_v2 for j in v2]
-    v1_v2_prod = [(k*1.0*n) for k, n in zip(v1, v2) ]
-    print "v12rpdo", v1_v2_prod
-    e_v1_v2 = expected_vector(v1_v2_prod) - 1.0*e_v1*e_v2
-    return e_v1_v2
+    
+    temp_sum = 0
+    for i in range(len(v1)):
+        temp = (v1[i]- e_v1)**2
+        temp_sum +=temp
+    
+    temp_sum = temp_sum/2.0
+    return np.sqrt(temp_sum)
+                
+                   
     
 
 def compute_sigma_mles(train_data, train_labels):
@@ -112,7 +104,18 @@ def compute_sigma_mles(train_data, train_labels):
     '''
     covariances = np.zeros((10, 64, 64))
     # Compute covariances
-    
+    for i in range(0, 1):
+        i_cov_column = np.zeros(64)
+        i_digits = data.get_digits_by_label(train_data, train_labels, i)
+        #print "cov dig digit", cov_diag_vector(i_digits[:,i]) 
+        #print "idigit", i_digits
+        for j in range(0, 64):
+            i_cov_column[j] = cov_diag_vector(i_digits[:,i]) 
+            
+        #construct 64 by 64
+        for ii in i_cov_column:
+            for jj in i_
+        covariances[i] = i_cov_column
     
     
     return covariances
@@ -170,17 +173,9 @@ def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
 
     # Fit the model
-    #means = compute_mean_mles(train_data, train_labels)
-    #covariances = compute_sigma_mles(train_data, train_labels)
+    means = compute_mean_mles(train_data, train_labels)
+    covariances = compute_sigma_mles(train_data, train_labels)
     # Evaluation
-    v1 = [0,3,1,2]
-    v2 = [0, 3, -1,0]
     
-    X = np.vstack((v1,v2))
-    print "np cov", np.cov(X)
-    print "np var 1 cov", np.cov(v1)
-    bla = cov_vectors(v1, v2)
-    print "cpv vec", bla
-
 if __name__ == '__main__':
     main()

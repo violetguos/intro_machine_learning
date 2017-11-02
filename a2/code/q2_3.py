@@ -23,6 +23,28 @@ def compute_parameters(train_data, train_labels):
     where the ith row corresponds to the ith digit class.
     '''
     eta = np.zeros((10, 64))
+    #for each class k, count the 1st pixel in 700 vectors that is one
+    #add the beta distribution
+    n = 700
+    nc_list = []
+    for i in range(0, 7):
+        nc = 0
+        nc_sublist = []
+        for j in range(0, 64):
+            if train_data[i][j] == 1:
+                nc +=1
+            nc_sublist.append((nc, train_labels[i]))
+        nc_list.append(nc_sublist)
+        print "sbu", len(nc_sublist)
+        
+    
+    print "nc_list", len(nc_list)
+    
+    
+    #make a hash table list, i is label, nc is total count
+    
+        
+    
     return eta
 
 def plot_images(class_images):
@@ -41,6 +63,9 @@ def generate_new_data(eta):
     Plot these values
     '''
     generated_data = np.zeros((10, 64))
+    
+    
+    
     plot_images(generated_data)
 
 def generative_likelihood(bin_digits, eta):

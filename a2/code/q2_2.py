@@ -75,21 +75,22 @@ def expected_vector(v1):
     return expect_val
     
 
-def cov_vector(v1):
+def cov_vector(v1, v2):
     '''
-    calcs sqrt(v1 - mean)**2 / 2
+    calcs sqrt(v1 - mean)/ 2
     return a component of covar
     '''
     
-    e_v1 = expected_vector(v1)
-    
+    e_v1 = np.mean(v1)
+    e_v2 = np.mean(v2)
     temp_sum = 0
     for i in range(len(v1)):
-        temp = (v1[i]- e_v1)**2
+        #print "vqeoiajsiof", v1[i]
+        temp = (v1[i])*(v2[i]) - e_v1*e_v2
         temp_sum +=temp
     
     temp_sum = temp_sum/(1.0 * len(v1) - 1)
-    return np.sqrt(temp_sum)
+    return (temp_sum)
                 
                    
     
@@ -105,38 +106,39 @@ def compute_sigma_mles(train_data, train_labels):
     # Compute covariances
     
     test_cov = np.zeros((10, 64, 64))
-    for i in range(0, 1):
-        i_cov_column = np.zeros(64)
-        #print i_cov_column.shape
+    for i in range(0, 10):
+  
         i_digits = data.get_digits_by_label(train_data, train_labels, i)
         #print "idigit", i_digits[:,i].shape #i digits 700 by 64
-        for j in range(0, 64):
-            i_cov_column[j] = cov_vector(i_digits[:,j]) 
-            
+
         #construct 64 by 64
         for ii in range(0, 64):
-            #print "-------------covar----------"
-            #print i_cov_column
             for jj in range(0, 64):
-                covariances[i][ii][jj] = i_cov_column[ii] * i_cov_column[jj]
-                
-        test_cov[i] =np.cov(i_digits.T)    
-    if(np.array_equal(covariances, test_cov)):
-        print "================SUCCESSFUL===================="
-    #test_cov = test_cov.reshape(test_cov.shape[0],test_cov.shape[1]*test_cov.shape[2])
-    #np.savetxt('text.txt',test_cov,fmt='%.5f',delimiter=',')
+                #print "-------------covar----------"
+                i_cov_column = cov_vector(i_digits[:,ii], i_digits[:,jj]) 
+                #print i_cov_column  
+                covariances[i][ii][jj] = i_cov_column
+        #test_cov[i] =np.cov(i_digits.T)
+    #test_cov = test_cov.reshape(test_cov.shape[0],\
+                                      #test_cov.shape[1]*test_cov.shape[2])
+    #np.savetxt('h1.txt',test_cov,fmt='%.5f',delimiter=',')    
     
-    #print "-------------------------------------"
-    #print test_cov[0]
-    #print "=-------------------------------------"
-    #print covariances[0]
+
     return covariances
 
 def plot_cov_diagonal(covariances):
     # Plot the diagonal of each covariance matrix side by side
+    cov_diag_all = []
     for i in range(10):
         cov_diag = np.diag(covariances[i])
-        # ...
+        #print "-------------covdiag------"
+        #print cov_diag
+        i_mean_matrix = np.reshape(cov_diag, (8,8))
+        means.append(i_mean_matrix)
+        cov_diag_all.append(cov_diag)
+    all_concat = np.concatenate(cov_diag_all,0)
+    plt.imshow(all_concat, cmap='gray')
+    plt.show()
 
 def generative_likelihood(digits, means, covariances):
     '''
@@ -182,17 +184,6 @@ def classify_data(digits, means, covariances):
     pass
 
 
-def file_comp():
-    with open('h.txt', 'r') as file1:
-        with open('text.txt', 'r') as file2:
-            same = set(file1).intersection(file2)
-
-    same.discard('\n')
-
-    with open('h2.txt', 'w') as file_out:
-        for line in same:
-            file_out.write(line)
-    return
 
 def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
@@ -200,17 +191,11 @@ def main():
     # Fit the model
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
-    #print "========cov======="
-    #print covariances
-    # Evaluation
-    
-    #TESTING ONLY
     #covariances = covariances.reshape(covariances.shape[0],\
                                       #covariances.shape[1]*covariances.shape[2])
     #np.savetxt('h.txt',covariances,fmt='%.5f',delimiter=',')
-    #file_comp();
 
-    #testing covariance shit
+    plot_cov_diagonal(covariances)
     
     
 if __name__ == '__main__':

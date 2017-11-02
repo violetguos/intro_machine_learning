@@ -63,17 +63,6 @@ def compute_mean_mles(train_data, train_labels):
     return means
 
 
-'''def expected_vector(v1):
-    len_v1 = 1.0* len(v1)
-    
-    prob = 1.0 / (len_v1)
-    temp_sum = 0
-    for i in range(len(v1)):
-         temp_sum += v1[i]
-    
-    expect_val = temp_sum *prob
-    return expect_val
- '''   
 
 def cov_vector(v1, v2):
     '''
@@ -144,17 +133,57 @@ def plot_cov_diagonal(covariances):
     all_concat = np.concatenate(cov_diag_all,1)
     plt.imshow(all_concat, cmap='gray')
     plt.show()
+    
+    
+def sqrt_matrix(m1):
+    '''
+    find sqrt of a 2d matrix
+    '''
+    rt = np.zeros((64, 64))
+    for i in range(0, 64):
+        rt[i] = np.sqrt(m1[i])
+    return rt
 
+def tuple_to_arr(t1, n):
+    '''
+    convert tuple of arrays to array of arrays
+    '''
+    arr = np.zeros((n, n))
+    print np.asarray(t1[0])
+    for i in range(0, n):
+        arr[i] = np.asarray(t1[i])
+
+    return arr
+    
+    
+    
 def generative_likelihood(digits, means, covariances):
     '''
     Compute the generative log-likelihood:
         log p(x|y,mu,Sigma)
 
     Should return an n x 10 numpy array 
+    mean, 10 by 64 
     '''
+    p_x = np.zeros((10, 64))
+    for i in range(0, 10):
+        x= data.get_digits_by_label(digits[0], digits[1], i)
+        for j in range(0, 700):
+            pi_term =  pow((2*np.pi), -64/2)
+            dumvar, eig_term = np.linalg.eig(covariances[i])
+            eig_term = tuple_to_arr(eig_term, 64)
+            eig_term_root = sqrt_matrix(eig_term)
+            x_diff_miu = np.subtract(x[j,:], means[i])
+            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
+            exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu))
+            
+            #dot 3 term.....
+            p_x1 = np.dot( pi_term , eig_term_root)
+            p_x[i] = np.dot(p_x1,  exp_term)
     
-    
-    return None
+    p_x = p_x.T
+    #print p_x
+    return p_x
 
 def conditional_likelihood(digits, means, covariances):
     '''
@@ -196,12 +225,20 @@ def main():
     # Fit the model
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
+    #eig_term = np.linalg.eig(covariances[0])
+    #print "eig value", eig_term
+    
+    #a = np.arange(16).reshape(4, 4)
+    #aa, b = np.linalg.eig(a)
+    #print "before", b
+    #b = tuple_to_arr(b)
+    #print "after", b
     #covariances = covariances.reshape(covariances.shape[0],\
                                       #covariances.shape[1]*covariances.shape[2])
     #np.savetxt('h.txt',covariances,fmt='%.5f',delimiter=',')
 
-    plot_cov_diagonal(covariances)
-    
+    #plot_cov_diagonal(covariances)
+    generative_likelihood((train_data, train_labels), means, covariances)
     
 if __name__ == '__main__':
     main()

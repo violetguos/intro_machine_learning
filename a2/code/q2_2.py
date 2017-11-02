@@ -63,7 +63,7 @@ def compute_mean_mles(train_data, train_labels):
     return means
 
 
-def expected_vector(v1):
+'''def expected_vector(v1):
     len_v1 = 1.0* len(v1)
     
     prob = 1.0 / (len_v1)
@@ -73,7 +73,7 @@ def expected_vector(v1):
     
     expect_val = temp_sum *prob
     return expect_val
-    
+ '''   
 
 def cov_vector(v1, v2):
     '''
@@ -115,7 +115,10 @@ def compute_sigma_mles(train_data, train_labels):
         for ii in range(0, 64):
             for jj in range(0, 64):
                 #print "-------------covar----------"
-                i_cov_column = cov_vector(i_digits[:,ii], i_digits[:,jj]) 
+                #*this is verified with np cov
+                i_cov_column = cov_vector(i_digits[:,ii], i_digits[:,jj])
+                iden_matrix = 0.01*np.identity(64)
+                np.add(iden_matrix, i_cov_column)
                 #print i_cov_column  
                 covariances[i][ii][jj] = i_cov_column
         #test_cov[i] =np.cov(i_digits.T)
@@ -129,14 +132,16 @@ def compute_sigma_mles(train_data, train_labels):
 def plot_cov_diagonal(covariances):
     # Plot the diagonal of each covariance matrix side by side
     cov_diag_all = []
-    for i in range(10):
+    for i in range(10):       
+        i_mean_matrix = np.zeros((8,8))
+
         cov_diag = np.diag(covariances[i])
+        log_cov_diag = np.log(cov_diag)
         #print "-------------covdiag------"
-        #print cov_diag
-        i_mean_matrix = np.reshape(cov_diag, (8,8))
-        means.append(i_mean_matrix)
-        cov_diag_all.append(cov_diag)
-    all_concat = np.concatenate(cov_diag_all,0)
+        #print cov_diag.shape
+        i_mean_matrix = np.reshape(log_cov_diag, (8,8))
+        cov_diag_all.append(i_mean_matrix)
+    all_concat = np.concatenate(cov_diag_all,1)
     plt.imshow(all_concat, cmap='gray')
     plt.show()
 

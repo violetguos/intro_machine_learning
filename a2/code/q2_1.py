@@ -34,7 +34,7 @@ class KNearestNeighbor(object):
         assert test_point.shape[1] == self.train_data.shape[1]
 
         # Compute squared distance
-        train_norm = (self.train_data**2).sum(axis=1).reshape(-1,1)
+        #train_norm = (self.train_data**2).sum(axis=1).reshape(-1,1)
         test_norm = (test_point**2).sum(axis=1).reshape(1,-1)
         dist = self.train_norm + test_norm - 2*self.train_data.dot(test_point.transpose())
         return np.squeeze(dist)

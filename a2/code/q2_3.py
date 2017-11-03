@@ -22,28 +22,24 @@ def compute_parameters(train_data, train_labels):
     You should return a numpy array of shape (10, 64)
     where the ith row corresponds to the ith digit class.
     '''
+    #make a hash table list, i is label, nc is total count
     eta = np.zeros((10, 64))
+    nc = np.zeros((10, 64))
     #for each class k, count the 1st pixel in 700 vectors that is one
     #add the beta distribution
-    n = 700
-    nc_list = []
-    for i in range(0, 7):
-        nc = 0
-        nc_sublist = []
+    for i in range(0, 10):
+        i_digits = data.get_digits_by_label(train_data, train_labels, i)
+        for j in range(0, 700):
+            for k in range(0, 64):
+                if i_digits[j][k] == 1:
+                    nc[i][k] +=1
+    #calculate beta(2,2)
+    for i in range(0, 10):
         for j in range(0, 64):
-            if train_data[i][j] == 1:
-                nc +=1
-            nc_sublist.append((nc, train_labels[i]))
-        nc_list.append(nc_sublist)
-        print "sbu", len(nc_sublist)
+            eta[i][j] =  1.0*(nc[i][j] + 2 -1) / (700 +2 +2+ -2)
         
-    
-    print "nc_list", len(nc_list)
-    
-    
-    #make a hash table list, i is label, nc is total count
-    
-        
+    #print "nc_list", (nc)
+    #print eta
     
     return eta
 
@@ -51,11 +47,17 @@ def plot_images(class_images):
     '''
     Plot each of the images corresponding to each class side by side in grayscale
     '''
+    img_matrix = []
     for i in range(10):
         img_i = class_images[i]
-        # ...
-
-def generate_new_data(eta):
+        i_matrix = np.zeros((8,8))
+        i_matrix = np.reshape(img_i, (8,8))
+        img_matrix.append(i_matrix)
+    all_concat = np.concatenate(img_matrix,1)
+    plt.imshow(all_concat, cmap='gray')
+    plt.show()
+    
+def generate_new_data(train_data, train_labels, eta):
     '''
     Sample a new data point from your generative distribution p(x|y,theta) for
     each value of y in the range 0...10
@@ -63,9 +65,14 @@ def generate_new_data(eta):
     Plot these values
     '''
     generated_data = np.zeros((10, 64))
-    
-    
-    
+
+    for i in range(0, 10):
+        i_digits = data.get_digits_by_label(train_data, train_labels, i)
+        for j in range(0, 64):
+            for k in range(0, 700):
+                generated_data[i][j] = pow(eta[i][j], i_digits[k][j]) *\
+                                    pow((1-eta[i][j]),(1 -i_digits[k][j]))
+            
     plot_images(generated_data)
 
 def generative_likelihood(bin_digits, eta):
@@ -75,6 +82,7 @@ def generative_likelihood(bin_digits, eta):
 
     Should return an n x 10 numpy array 
     '''
+    
     return None
 
 def conditional_likelihood(bin_digits, eta):
@@ -119,7 +127,7 @@ def main():
     # Evaluation
     plot_images(eta)
 
-    generate_new_data(eta)
+    generate_new_data(train_data, train_labels, eta)
 
 if __name__ == '__main__':
     main()

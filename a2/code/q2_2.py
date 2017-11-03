@@ -110,13 +110,13 @@ def compute_sigma_mles(train_data, train_labels):
                 np.add(iden_matrix, i_cov_column)
                 #print i_cov_column  
                 covariances[i][ii][jj] = i_cov_column
-        #test_cov[i] =np.cov(i_digits.T)
+        test_cov[i] =np.cov(i_digits.T)
     #test_cov = test_cov.reshape(test_cov.shape[0],\
                                       #test_cov.shape[1]*test_cov.shape[2])
     #np.savetxt('h1.txt',test_cov,fmt='%.5f',delimiter=',')    
     
 
-    return covariances
+    return test_cov#covariances
 
 def plot_cov_diagonal(covariances):
     # Plot the diagonal of each covariance matrix side by side
@@ -141,20 +141,12 @@ def sqrt_matrix(m1):
     '''
     rt = np.zeros((64, 64))
     for i in range(0, 64):
-        rt[i] = np.sqrt(m1[i])
+        rt[i] = np.sqrt(abs(m1[i]))
+    #print m1[0]
+    #    print rt[0]
     return rt
 
-def tuple_to_arr(t1, n):
-    '''
-    convert tuple of arrays to array of arrays
-    '''
-    arr = np.zeros((n, n))
-    print np.asarray(t1[0])
-    for i in range(0, n):
-        arr[i] = np.asarray(t1[i])
 
-    return arr
-    
     
     
 def generative_likelihood(digits, means, covariances):
@@ -171,18 +163,28 @@ def generative_likelihood(digits, means, covariances):
         for j in range(0, 700):
             pi_term =  pow((2*np.pi), -64/2)
             dumvar, eig_term = np.linalg.eig(covariances[i])
-            eig_term = tuple_to_arr(eig_term, 64)
-            eig_term_root = sqrt_matrix(eig_term)
+            #print "---------eig--------------"
+            #print eig_term
+            #eig_term = tuple_to_arr(eig_term, 64)
+            eig_term_root = sqrt_matrix(eig_term) #64 by 64
+            #print eig_term_root
             x_diff_miu = np.subtract(x[j,:], means[i])
             x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
-            exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu))
+            exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
             
             #dot 3 term.....
-            p_x1 = np.dot( pi_term , eig_term_root)
-            p_x[i] = np.dot(p_x1,  exp_term)
+
+            p_x1 = pi_term * eig_term_root
+            #print "-----------------------"
+            #print "px1 dim", p_x1.shape 
+            #print "-----------------------"
+            #print "exp term", exp_term
+            p_x[i] = p_x1 * exp_term
     
     p_x = p_x.T
-    #print p_x
+    print "---------"
+    print p_x
+    print p_x.shape
     return p_x
 
 def conditional_likelihood(digits, means, covariances):
@@ -225,6 +227,7 @@ def main():
     # Fit the model
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
+    print np.sqrt(covariances[0][0])
     #eig_term = np.linalg.eig(covariances[0])
     #print "eig value", eig_term
     
@@ -238,7 +241,6 @@ def main():
     #np.savetxt('h.txt',covariances,fmt='%.5f',delimiter=',')
 
     #plot_cov_diagonal(covariances)
-    generative_likelihood((train_data, train_labels), means, covariances)
-    
+    #generative_likelihood((train_data, train_labels), means, covariances)
 if __name__ == '__main__':
     main()

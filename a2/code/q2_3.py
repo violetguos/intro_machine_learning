@@ -57,7 +57,7 @@ def plot_images(class_images):
     plt.imshow(all_concat, cmap='gray')
     plt.show()
     
-def generate_new_data(train_data, train_labels, eta):
+def generate_new_data(eta):
     '''
     Sample a new data point from your generative distribution p(x|y,theta) for
     each value of y in the range 0...10
@@ -67,11 +67,13 @@ def generate_new_data(train_data, train_labels, eta):
     generated_data = np.zeros((10, 64))
 
     for i in range(0, 10):
-        i_digits = data.get_digits_by_label(train_data, train_labels, i)
         for j in range(0, 64):
-            for k in range(0, 700):
-                generated_data[i][j] = pow(eta[i][j], i_digits[k][j]) *\
-                                    pow((1-eta[i][j]),(1 -i_digits[k][j]))
+            if eta[i][j] > 0.5:
+                b_j = 1
+            else:
+                b_j = 0
+            generated_data[i][j] = pow(eta[i][j], b_j) *\
+                                    pow((1-eta[i][j]),(1 -b_j))
             
     plot_images(generated_data)
 
@@ -127,7 +129,7 @@ def main():
     # Evaluation
     plot_images(eta)
 
-    generate_new_data(train_data, train_labels, eta)
+    generate_new_data(eta)
 
 if __name__ == '__main__':
     main()

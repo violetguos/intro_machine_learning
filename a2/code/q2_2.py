@@ -163,11 +163,11 @@ def generative_likelihood(digits, means, covariances):
         x= data.get_digits_by_label(digits[0], digits[1], i)
         for j in range(0, 700):
             pi_term =  pow((2*np.pi), -64/2)
-            dumvar, eig_term = np.linalg.eig(covariances[i])
+            det_term = np.linalg.det(covariances[i])
             #print "---------eig--------------"
             #print eig_term
             #eig_term = tuple_to_arr(eig_term, 64)
-            eig_term_root = sqrt_matrix(eig_term) #64 by 64
+            det_term_root = sqrt_matrix(eig_term) #64 by 64
             #print eig_term_root
             x_diff_miu = np.subtract(x[j,:], means[i])
             x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
@@ -175,7 +175,7 @@ def generative_likelihood(digits, means, covariances):
             
             print "#dot 3 term....."
             print exp_term
-            p_x1 = pi_term * eig_term_root
+            p_x1 = pi_term * det_term_root
             #print "-----------------------"
             #print "px1 dim", p_x1.shape 
             #print "-----------------------"

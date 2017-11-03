@@ -106,17 +106,18 @@ def compute_sigma_mles(train_data, train_labels):
                 #print "-------------covar----------"
                 #*this is verified with np cov
                 i_cov_column = cov_vector(i_digits[:,ii], i_digits[:,jj])
-                iden_matrix = 0.01*np.identity(64)
-                np.add(iden_matrix, i_cov_column)
+                
                 #print i_cov_column  
                 covariances[i][ii][jj] = i_cov_column
-        test_cov[i] =np.cov(i_digits.T)
+            iden_matrix = 0.01*np.identity(64)
+            np.add(iden_matrix, covariances[i])
+        #test_cov[i] =np.cov(i_digits.T)
     #test_cov = test_cov.reshape(test_cov.shape[0],\
                                       #test_cov.shape[1]*test_cov.shape[2])
     #np.savetxt('h1.txt',test_cov,fmt='%.5f',delimiter=',')    
     
 
-    return test_cov#covariances
+    return covariances
 
 def plot_cov_diagonal(covariances):
     # Plot the diagonal of each covariance matrix side by side
@@ -172,8 +173,8 @@ def generative_likelihood(digits, means, covariances):
             x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
             exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
             
-            #dot 3 term.....
-
+            print "#dot 3 term....."
+            print exp_term
             p_x1 = pi_term * eig_term_root
             #print "-----------------------"
             #print "px1 dim", p_x1.shape 
@@ -227,7 +228,7 @@ def main():
     # Fit the model
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
-    print np.sqrt(covariances[0][0])
+    #print np.sqrt(covariances[0][0])
     #eig_term = np.linalg.eig(covariances[0])
     #print "eig value", eig_term
     
@@ -241,6 +242,6 @@ def main():
     #np.savetxt('h.txt',covariances,fmt='%.5f',delimiter=',')
 
     #plot_cov_diagonal(covariances)
-    #generative_likelihood((train_data, train_labels), means, covariances)
+    generative_likelihood((train_data, train_labels), means, covariances)
 if __name__ == '__main__':
     main()

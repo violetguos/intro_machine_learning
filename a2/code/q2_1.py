@@ -48,14 +48,9 @@ class KNearestNeighbor(object):
         '''
         labels = [float(i) for i in range(0,10)]
         distances = np.array(self.l2_distance(test_point))
-        #distances = np.asarray(distances[0]) 
-        #print "distace", distances
-         #indices of the k smallest in distance
+
         k_idx = np.array((distances.argsort()[:k]))
-        #k_idx = np.asarray(k_idx[0]) #conver to a ndarray
-        #print "k idx", k_idx
-        #build a hash table of label/digit to counts
-        #a list [] of tuple(label, count)
+
         label_count = np.zeros(10)
         #index is the label, number is # of instance in k Neighbours
         for j in k_idx:
@@ -73,7 +68,7 @@ class KNearestNeighbor(object):
 
         return digit
 
-def cross_validation(knn, k_range=np.arange(1,15)):
+def cross_validation(train_data, train_labels, k_range=np.arange(1,15)):
     all_k = []
     for k in k_range:
         # Loop over folds
@@ -81,9 +76,9 @@ def cross_validation(knn, k_range=np.arange(1,15)):
         # ...
         kf = KFold(n_splits=10)
         k_train_accuracy = []
-        for train_index, test_index in kf.split(knn.train_data):
-            x_train, x_test = knn.train_data[train_index], knn.train_data[test_index]
-            y_train, y_test = knn.train_labels[train_index], knn.train_labels[test_index]
+        for train_index, test_index in kf.split(train_data):
+            x_train, x_test = train_data[train_index], train_data[test_index]
+            y_train, y_test = train_labels[train_index], train_labels[test_index]
             knn_new = KNearestNeighbor(x_train, y_train)
             k_train_accuracy.append(classification_accuracy(knn_new ,k, x_test, y_test))
         k_accuracy = (1.0 *sum(k_train_accuracy)) / (1.0 *len(k_train_accuracy))   
@@ -124,19 +119,19 @@ def main():
 
 
     #===========Q1,2--------#
-    #k_1_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
-    #k_15_accuracy = classification_accuracy(knn, 15, test_data, test_labels)
-    #print "k 1", k_1_accuracy
+    k_1_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
+    k_15_accuracy = classification_accuracy(knn, 15, test_data, test_labels)
+    print "k 1", k_1_accuracy
     
-    #print "k 15.", k_15_accuracy
+    print "k 15.", k_15_accuracy
     
     #-----------------Q3---------------#
-    #opti_k_index = cross_validation(knn)
+    opti_k_index = cross_validation(train_data, train_labels)
     #k1_accuracy is the highest
     k_1_test_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
     k_1_train_accuracy = classification_accuracy(knn, 1, train_data, train_labels)
-    print k_1_test_accuracy
-    print k_1_train_accuracy
+    print "k_1_test_accuracy", k_1_test_accuracy
+    print "k_1_train_accuracy", k_1_train_accuracy
     
 if __name__ == '__main__':
     main()

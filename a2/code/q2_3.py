@@ -84,7 +84,14 @@ def generative_likelihood(bin_digits, eta):
 
     Should return an n x 10 numpy array 
     '''
-    
+    log_p_x = np.zeros((64, 10))
+    for i in range(0,10):
+        i_digit = data.get_digits_by_label(bin_digits[0], bin_digits[1], i)
+        for j in range(0, 64):
+            p_x = pow(eta[i][j], i_digit[i, j]) *\
+                                    pow((1-eta[i][j]),i_digit[i, j])
+            log_p_x[j][i] = np.log(p_x)
+        
     return None
 
 def conditional_likelihood(bin_digits, eta):

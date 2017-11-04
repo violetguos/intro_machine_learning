@@ -147,7 +147,33 @@ def sqrt_matrix(m1):
     #    print rt[0]
     return rt
 
-
+def generative_likelihood_helper(digits, means, covariances):
+     p_x = np.zeros((10, 64))
+    for i in range(0, 10):
+        x= data.get_digits_by_label(digits[0], digits[1], i)
+        for j in range(0, 700):
+            pi_term =  pow((2*np.pi), -64/2)
+            det_term = np.linalg.det(covariances[i])
+            #print "---------eig--------------"
+            #print eig_term
+            #eig_term = tuple_to_arr(eig_term, 64)
+            det_term_root = np.sqrt(det_term) #64 by 64
+            #print eig_term_root
+            x_diff_miu = np.subtract(x[j,:], means[i])
+            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
+            exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
+            
+            #print "#dot 3 term....."
+            #print exp_term
+            p_x1 = pi_term * det_term_root
+            #print "-----------------------"
+            #print "px1 dim", p_x1.shape 
+            #print "-----------------------"
+            #print "exp term", exp_term
+            p_x[i] =  p_x1 * exp_term
+    
+    p_x = p_x.T
+    return p_x
     
     
 def generative_likelihood(digits, means, covariances):
@@ -158,35 +184,18 @@ def generative_likelihood(digits, means, covariances):
     Should return an n x 10 numpy array 
     mean, 10 by 64 
     '''
-    p_x = np.zeros((10, 64))
-    for i in range(0, 10):
-        x= data.get_digits_by_label(digits[0], digits[1], i)
-        for j in range(0, 700):
-            pi_term =  pow((2*np.pi), -64/2)
-            det_term = np.linalg.det(covariances[i])
-            #print "---------eig--------------"
-            #print eig_term
-            #eig_term = tuple_to_arr(eig_term, 64)
-            det_term_root = sqrt_matrix(eig_term) #64 by 64
-            #print eig_term_root
-            x_diff_miu = np.subtract(x[j,:], means[i])
-            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
-            exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
-            
-            print "#dot 3 term....."
-            print exp_term
-            p_x1 = pi_term * det_term_root
-            #print "-----------------------"
-            #print "px1 dim", p_x1.shape 
-            #print "-----------------------"
-            #print "exp term", exp_term
-            p_x[i] = p_x1 * exp_term
+ 
+    #print "---------"
+    #print p_x
+    #print p_x.shape
+    log_p_x = generative_likelihood_helper(digits, means, covariances)
     
-    p_x = p_x.T
-    print "---------"
-    print p_x
-    print p_x.shape
-    return p_x
+    for i in range(0, 64):
+        for j in range(0, 10):
+            log_p_x[i][j] = np.log(log_p_x[i][j])
+    
+    
+    return log_p_x
 
 def conditional_likelihood(digits, means, covariances):
     '''
@@ -197,6 +206,9 @@ def conditional_likelihood(digits, means, covariances):
     This should be a numpy array of shape (n, 10)
     Where n is the number of datapoints and 10 corresponds to each digit class
     '''
+    p_x = generative_likelihood_helper(digits, means, covariances)
+    
+    
     return None
 
 def avg_conditional_likelihood(digits, labels, means, covariances):

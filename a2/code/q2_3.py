@@ -68,7 +68,7 @@ def generate_new_data(eta):
 
     for i in range(0, 10):
         for j in range(0, 64):
-            if eta[i][j] > 0.5:
+            if eta[i][j] < 0.5:
                 b_j = 1
             else:
                 b_j = 0
@@ -92,7 +92,7 @@ def generative_likelihood(bin_digits, eta):
                                     pow((1-eta[i][j]),i_digit[i, j])
             log_p_x[j][i] = np.log(p_x)
         
-    return None
+    return log_p_x
 
 def conditional_likelihood(bin_digits, eta):
     '''

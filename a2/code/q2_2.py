@@ -10,19 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 
-def unblockshaped(arr, h, w):
-    """
-    Return an array of shape (h, w) where
-    h * w = arr.size
-
-    If arr is of shape (n, nrows, ncols), n sublocks of shape (nrows, ncols),
-    then the returned array preserves the "physical" layout of the sublocks.
-    """
-    n, nrows, ncols = arr.shape
-    return (arr.reshape(h//nrows, -1, nrows, ncols)
-               .swapaxes(1,2)
-               .reshape(h, w))
-
 
 def mean_i_digit(i_digits):
     
@@ -136,33 +123,27 @@ def plot_cov_diagonal(covariances):
     plt.show()
     
     
-def sqrt_matrix(m1):
-    '''
-    find sqrt of a 2d matrix
-    '''
-    rt = np.zeros((64, 64))
-    for i in range(0, 64):
-        rt[i] = np.sqrt(abs(m1[i]))
-    #print m1[0]
-    #    print rt[0]
-    return rt
 
 def generative_likelihood_helper(digits, means, covariances):
-     p_x = np.zeros((10, 64))
-    for i in range(0, 10):
-        x= data.get_digits_by_label(digits[0], digits[1], i)
-        for j in range(0, 700):
-            pi_term =  pow((2*np.pi), -64/2)
+    n = len(digits)
+    p_x = np.zeros((n,10))
+    for j in range(0, n):
+        for i in range(0, 10):
+            x = digits
+
+            pi_term =  pow((2*np.pi), -10/2)
             det_term = np.linalg.det(covariances[i])
             #print "---------eig--------------"
             #print eig_term
             #eig_term = tuple_to_arr(eig_term, 64)
             det_term_root = np.sqrt(det_term) #64 by 64
             #print eig_term_root
-            x_diff_miu = np.subtract(x[j,:], means[i])
-            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.det(covariances[i]) )
+            x_diff_miu = np.subtract(x[j], means[i])
+            #print x[j].shape
+            #print means[i].shape
+            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.inv(covariances[i]) )
             exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
-            
+        
             #print "#dot 3 term....."
             #print exp_term
             p_x1 = pi_term * det_term_root
@@ -170,9 +151,13 @@ def generative_likelihood_helper(digits, means, covariances):
             #print "px1 dim", p_x1.shape 
             #print "-----------------------"
             #print "exp term", exp_term
-            p_x[i] =  p_x1 * exp_term
-    
-    p_x = p_x.T
+           
+                
+            p_x[j][i] =  p_x1 * exp_term
+        #ii += 1
+
+    #p_x = p_x.T
+    print p_x
     return p_x
     
     
@@ -182,15 +167,16 @@ def generative_likelihood(digits, means, covariances):
         log p(x|y,mu,Sigma)
 
     Should return an n x 10 numpy array 
-    mean, 10 by 64 
     '''
  
     #print "---------"
     #print p_x
     #print p_x.shape
+    n = len(digits)
+
     log_p_x = generative_likelihood_helper(digits, means, covariances)
     
-    for i in range(0, 64):
+    for i in range(0, n):
         for j in range(0, 10):
             log_p_x[i][j] = np.log(log_p_x[i][j])
     
@@ -206,10 +192,25 @@ def conditional_likelihood(digits, means, covariances):
     This should be a numpy array of shape (n, 10)
     Where n is the number of datapoints and 10 corresponds to each digit class
     '''
-    p_x = generative_likelihood_helper(digits, means, covariances)
+    n = len(digits)
+
+    p_x_y =generative_likelihood(digits, means, covariances)
     
+    p_x = np.zeros((n, 1))
     
-    return None
+    p_y_x = np.zeros((n, 10))
+     
+    for i in range(0, n):
+        for j in range(0, 10):
+            p_x[i] += 0.1 * p_x_y[i][j]
+    
+    for i in range(0, n):
+        for j in range(0, 10):
+            p_y_x_ = p_x_y[i][j] * 0.1 /p_x[i]
+            p_y_x[i][j] = np.log(p_y_x_)
+
+    #print p_y_x
+    return p_y_x
 
 def avg_conditional_likelihood(digits, labels, means, covariances):
     '''
@@ -220,17 +221,28 @@ def avg_conditional_likelihood(digits, labels, means, covariances):
     i.e. the average log likelihood that the model assigns to the correct class label
     '''
     cond_likelihood = conditional_likelihood(digits, means, covariances)
-
+    
     # Compute as described above and return
-    return None
+    avg_p_y = np.zeros((n, 1))
+    
+    for i in range(0,n):
+        avg_item = np.mean(cond_likelihood[i,:])
+        avg_p_y[i] = avg_item
+    
+    return avg_p_y
 
 def classify_data(digits, means, covariances):
     '''
     Classify new points by taking the most likely posterior class
     '''
-    cond_likelihood = conditional_likelihood(digits, means, covariances)
+    cond_likelihood = avg_conditional_likelihood(digits, means, covariances)
     # Compute and return the most likely class
-    pass
+    avg_conditional_likelihood
+    class_i = cond_likelihood.argmax()
+    
+    print "-------------class i ", class_i
+    print cond_likelihood.shape
+    return class_i
 
 
 
@@ -238,8 +250,19 @@ def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
 
     # Fit the model
+    print train_data[0,:].shape
+    test_arr = train_data[0,:]
+    print test_arr
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
+    
+    print means.shape
+    print covariances.shape
+    
+    
+    c_predict = classify_data(test_arr, means, covariances)
+    
+    print c_predict
     #print np.sqrt(covariances[0][0])
     #eig_term = np.linalg.eig(covariances[0])
     #print "eig value", eig_term
@@ -254,6 +277,6 @@ def main():
     #np.savetxt('h.txt',covariances,fmt='%.5f',delimiter=',')
 
     #plot_cov_diagonal(covariances)
-    generative_likelihood((train_data, train_labels), means, covariances)
+    #generative_likelihood((train_data, train_labels), means, covariances)
 if __name__ == '__main__':
     main()

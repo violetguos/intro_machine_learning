@@ -77,6 +77,9 @@ def generate_new_data(eta):
             
     plot_images(generated_data)
 
+
+
+
 def generative_likelihood(bin_digits, eta):
     '''
     Compute the generative log-likelihood:
@@ -103,6 +106,10 @@ def conditional_likelihood(bin_digits, eta):
     This should be a numpy array of shape (n, 10)
     Where n is the number of datapoints and 10 corresponds to each digit class
     '''
+    p_x_y = generative_likelihood(bin_digits, eta)
+    
+    
+    
     return None
 
 def avg_conditional_likelihood(bin_digits, labels, eta):

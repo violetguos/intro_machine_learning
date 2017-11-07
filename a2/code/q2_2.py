@@ -157,7 +157,7 @@ def generative_likelihood_helper(digits, means, covariances):
         #ii += 1
 
     #p_x = p_x.T
-    print p_x
+    #print p_x
     return p_x
     
     
@@ -212,7 +212,8 @@ def conditional_likelihood(digits, means, covariances):
     #print p_y_x
     return p_y_x
 
-def avg_conditional_likelihood(digits, labels, means, covariances):
+def avg_conditional_likelihood(digits, means, covariances):
+    #(digits, labels, means, covariances):
     '''
     Compute the average conditional likelihood over the true class labels
 
@@ -223,6 +224,7 @@ def avg_conditional_likelihood(digits, labels, means, covariances):
     cond_likelihood = conditional_likelihood(digits, means, covariances)
     
     # Compute as described above and return
+    n = len(digits)
     avg_p_y = np.zeros((n, 1))
     
     for i in range(0,n):
@@ -235,12 +237,13 @@ def classify_data(digits, means, covariances):
     '''
     Classify new points by taking the most likely posterior class
     '''
-    cond_likelihood = avg_conditional_likelihood(digits, means, covariances)
+    cond_likelihood = conditional_likelihood(digits, means, covariances)
     # Compute and return the most likely class
-    avg_conditional_likelihood
-    class_i = cond_likelihood.argmax()
     
-    print "-------------class i ", class_i
+    class_i, class_j = np.unravel_index\
+                        (cond_likelihood.argmax(), cond_likelihood.shape)
+    
+    print "-------------class i ", class_i, "  ", class_j
     print cond_likelihood.shape
     return class_i
 
@@ -251,13 +254,14 @@ def main():
 
     # Fit the model
     print train_data[0,:].shape
-    test_arr = train_data[0,:]
-    print test_arr
+    test_arr = train_data[101,:]
+    
+    print "test arr, ", test_arr, " test label ", test_labels[101],
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
     
-    print means.shape
-    print covariances.shape
+    #print means.shape (64,)
+    #print covariances.shape (10, 64, 64)
     
     
     c_predict = classify_data(test_arr, means, covariances)

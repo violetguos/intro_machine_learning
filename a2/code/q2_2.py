@@ -245,7 +245,7 @@ def classify_data(digits, means, covariances):
     
     print "-------------class i ", class_i, "  ", class_j
     print cond_likelihood.shape
-    return class_i
+    return class_
 
 
 

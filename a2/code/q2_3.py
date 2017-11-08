@@ -77,7 +77,23 @@ def generate_new_data(eta):
             
     plot_images(generated_data)
 
+def generative_likelihood_helper(bin_digits, eta):
+    '''
+    Compute the generative log-likelihood:
+        log p(x|y, eta)
 
+    Should return an n x 10 numpy array 
+    '''
+    n = bin_digits.shape[0]
+    nolog_p_x = np.zeros((n, 10))
+    for i in range(0,10):
+        #i_digit = data.get_digits_by_label(bin_digits[0], bin_digits[1], i)
+        for j in range(0, n):
+            p_x = pow(eta[i][j], bin_digits[i][j]) *\
+                                    pow((1-eta[i][j]), (1 - bin_digits[i][j]))
+            nolog_p_x[j][i] = (p_x)
+        
+    return nolog_p_x
 
 
 def generative_likelihood(bin_digits, eta):
@@ -87,12 +103,13 @@ def generative_likelihood(bin_digits, eta):
 
     Should return an n x 10 numpy array 
     '''
-    log_p_x = np.zeros((64, 10))
+    n = bin_digits.shape[0]
+    log_p_x = np.zeros((n, 10))
     for i in range(0,10):
-        i_digit = data.get_digits_by_label(bin_digits[0], bin_digits[1], i)
-        for j in range(0, 64):
-            p_x = pow(eta[i][j], i_digit[i, j]) *\
-                                    pow((1-eta[i][j]),i_digit[i, j])
+        #i_digit = data.get_digits_by_label(bin_digits[0], bin_digits[1], i)
+        for j in range(0, n):
+            p_x = pow(eta[i][j], bin_digits[i][j]) *\
+                                    pow((1-eta[i][j]), (1 - bin_digits[i][j]))
             log_p_x[j][i] = np.log(p_x)
         
     return log_p_x
@@ -106,7 +123,9 @@ def conditional_likelihood(bin_digits, eta):
     This should be a numpy array of shape (n, 10)
     Where n is the number of datapoints and 10 corresponds to each digit class
     '''
-    p_x_y = generative_likelihood(bin_digits, eta)
+    p_x_y = generative_likelihood_helper(bin_digits, eta)
+    n = bin_digits.shape[0]
+    p_y_x = np.zeros((n,10))
     
     
     

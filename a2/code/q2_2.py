@@ -127,6 +127,7 @@ def plot_cov_diagonal(covariances):
 def generative_likelihood_helper(digits, means, covariances):
     n = digits.shape[0]
     p_x = np.zeros((n,10))
+
     for j in range(0, n):
         for i in range(0, 10):
             x = digits
@@ -138,7 +139,8 @@ def generative_likelihood_helper(digits, means, covariances):
             #eig_term = tuple_to_arr(eig_term, 64)
             det_term_root = np.sqrt(det_term) #64 by 64
             #print eig_term_root
-            x_diff_miu = np.subtract(x[j,:], means[i])
+            x_diff_miu = np.subtract(x[j], means[i])
+            
             #print x[j].shape
             #print means[i].shape
             x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.inv(covariances[i]) )
@@ -174,7 +176,7 @@ def generative_likelihood(digits, means, covariances):
     #print p_x.shape
     n = digits.shape[0]
     log_p_x = generative_likelihood_helper(digits, means, covariances)
-    
+    print "-----------p x", log_p_x
     for i in range(0, n):
         for j in range(0, 10):
             log_p_x[i][j] = np.log(log_p_x[i][j])
@@ -194,7 +196,8 @@ def conditional_likelihood(digits, means, covariances):
     n = len(digits)
 
     p_x_y =generative_likelihood_helper(digits, means, covariances)
-    
+    print "-----------p x y", p_x_y
+
     p_x = 0 # p(x | sigma, miu)
     
     p_y_x = np.zeros((n, 10))
@@ -237,13 +240,18 @@ def classify_data(digits, means, covariances):
     Classify new points by taking the most likely posterior class
     '''
     cond_likelihood = conditional_likelihood(digits, means, covariances)
+    print "------cond likelihood----- ", cond_likelihood[0]
+    n  = digits.shape[0]
+    max_class = np.zeros(n)
     # Compute and return the most likely class
-    
-    class_i, class_j= np.unravel_index(cond_likelihood.argmax(), cond_likelihood.shape)
+    for i in range(digits.shape[0]):
+        #go through all n digits, pick the max out of 10
+        class_i = cond_likelihood[i,:] #ith row, has 10 digits
+        max_class[i] = class_i.argmax()
     
     #print "-------------class i ", class_i, "  ", class_j
     #print cond_likelihood.shape
-    return class_i
+    return max_class
 
 
 
@@ -263,10 +271,10 @@ def main():
     
  
     accurate_class = 0
-    for i in range(len(test_labels)):
-        c_predict = classify_data(test_data[i,:], means, covariances)
+    c_predict = classify_data(test_data, means, covariances)
 
-        if c_predict == test_labels[i]:
+    for i in range(len(test_labels)):
+        if c_predict[i] == test_labels[i]:
             accurate_class += 1
     print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
     

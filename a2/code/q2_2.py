@@ -46,7 +46,7 @@ def compute_mean_mles(train_data, train_labels):
         #700 row, 64 columns for each difit
 
         means[i] = mean_i_digit(i_digits) #imean is 64
-
+        
     return means
 
 
@@ -141,25 +141,25 @@ def generative_likelihood_helper(digits, means, covariances):
             #print eig_term_root
             x_diff_miu = np.subtract(x[j], means[i])
             
-            #print x[j].shape
-            #print means[i].shape
+            #print x[j].shape #64
+            #print means[i].shape #64
             x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.inv(covariances[i]) )
-            exp_term = np.exp(-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
+            exp_term = (-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
         
             #print "#dot 3 term....."
             #print exp_term
-            p_x1 = pi_term * det_term_root
+            p_x1 = pi_term /det_term_root
             #print "-----------------------"
             #print "px1 dim", p_x1.shape 
             #print "-----------------------"
             #print "exp term", exp_term
            
-                
-            p_x[j][i] =  p_x1 * exp_term
+            log_p_x1 = np.log(p_x1)    
+            p_x[j][i] =  log_p_x1 * exp_term
         #ii += 1
 
     #p_x = p_x.T
-    #print p_x
+    print p_x
     return p_x
     
     
@@ -177,9 +177,9 @@ def generative_likelihood(digits, means, covariances):
     n = digits.shape[0]
     log_p_x = generative_likelihood_helper(digits, means, covariances)
     print "-----------p x", log_p_x
-    for i in range(0, n):
-        for j in range(0, 10):
-            log_p_x[i][j] = np.log(log_p_x[i][j])
+    #for i in range(0, n):
+    #    for j in range(0, 10):
+    #        log_p_x[i][j] = np.log(log_p_x[i][j])
     
     
     return log_p_x
@@ -195,21 +195,22 @@ def conditional_likelihood(digits, means, covariances):
     '''
     n = len(digits)
 
-    p_x_y =generative_likelihood_helper(digits, means, covariances)
+    p_x_y =generative_likelihood(digits, means, covariances)
     print "-----------p x y", p_x_y
 
-    p_x = 0 # p(x | sigma, miu)
+    p_x = 0 # =np.zeros(n) # p(x | sigma, miu)
     
     p_y_x = np.zeros((n, 10))
      
     for i in range(0, n):
         for j in range(0, 10):
             p_x += 0.1 * p_x_y[i][j]
-    
+    print "------------------- p x---------------"
+    print p_x
     for i in range(0, n):
         for j in range(0, 10):
-            p_y_x_ = p_x_y[i][j] * 0.1 /p_x
-            p_y_x[i][j] = np.log(p_y_x_)
+            p_y_x_ = p_x_y[i][j] + np.log(0.1) - n * np.log(0.1) - np.sum(p_x_y)
+            p_y_x[i][j] = (p_y_x_)
 
     #print p_y_x
     return p_y_x
@@ -247,7 +248,7 @@ def classify_data(digits, means, covariances):
     for i in range(digits.shape[0]):
         #go through all n digits, pick the max out of 10
         class_i = cond_likelihood[i,:] #ith row, has 10 digits
-        max_class[i] = class_i.argmax()
+        max_class[i] = class_i.argmax() #or is it argmax
     
     #print "-------------class i ", class_i, "  ", class_j
     #print cond_likelihood.shape
@@ -269,7 +270,12 @@ def main():
     #print means.shape (64,)
     #print covariances.shape (10, 64, 64)
     
- 
+    
+    
+    #p = conditional_likelihood(train_data[0:2, 0:64], means, covariances)
+    #print p
+    
+    #the final code for classify but need to get everything work now
     accurate_class = 0
     c_predict = classify_data(test_data, means, covariances)
 
@@ -277,6 +283,7 @@ def main():
         if c_predict[i] == test_labels[i]:
             accurate_class += 1
     print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
+    
     
     #print np.sqrt(covariances[0][0])
     #eig_term = np.linalg.eig(covariances[0])

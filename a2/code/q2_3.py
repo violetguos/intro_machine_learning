@@ -77,23 +77,7 @@ def generate_new_data(eta):
             
     plot_images(generated_data)
 
-def generative_likelihood_helper(bin_digits, eta):
-    '''
-    Compute the generative log-likelihood:
-        log p(x|y, eta)
 
-    Should return an n x 10 numpy array 
-    '''
-    n = bin_digits.shape[0]
-    nolog_p_x = np.zeros((n, 10))
-    for i in range(0,10):
-        #i_digit = data.get_digits_by_label(bin_digits[0], bin_digits[1], i)
-        for j in range(0, n):
-            p_x = pow(eta[i][j], bin_digits[i][j]) *\
-                                    pow((1-eta[i][j]), (1 - bin_digits[i][j]))
-            nolog_p_x[j][i] = (p_x)
-        
-    return nolog_p_x
 
 
 def generative_likelihood(bin_digits, eta):
@@ -105,13 +89,15 @@ def generative_likelihood(bin_digits, eta):
     '''
     n = bin_digits.shape[0]
     log_p_x = np.zeros((n, 10))
-    for i in range(0,10):
-        #i_digit = data.get_digits_by_label(bin_digits[0], bin_digits[1], i)
-        for j in range(0, n):
-            p_x = pow(eta[i][j], bin_digits[i][j]) *\
-                                    pow((1-eta[i][j]), (1 - bin_digits[i][j]))
-            log_p_x[j][i] = np.log(p_x)
-        
+    for i in range(0,n):
+        for j in range(0, 10):
+            w0c = 0
+            wcj = 0
+            for k in range(0, 64):
+                wcj +=  bin_digits[i][k] * np.log((eta[j][k])/(1- eta[j][k]))
+                w0c += np.log(1- eta[j][k])
+            log_p_x[i][j] = wcj + w0c
+            
     return log_p_x
 
 def conditional_likelihood(bin_digits, eta):
@@ -123,13 +109,22 @@ def conditional_likelihood(bin_digits, eta):
     This should be a numpy array of shape (n, 10)
     Where n is the number of datapoints and 10 corresponds to each digit class
     '''
-    p_x_y = generative_likelihood_helper(bin_digits, eta)
     n = bin_digits.shape[0]
+    print "n",n, "  ", bin_digits.shape[1]
     p_y_x = np.zeros((n,10))
     
+    #P(y = c | x , theta) = 0.1 * p(x| y = c)
+    for i in range(0, n):
+        for j in range(0, 10):
+            w0c = 0
+            wcj = 0
+            for k in range(0, 64):
+                wcj +=  bin_digits[i][k] * np.log((eta[j][k])/(1- eta[j][k]))
+                w0c += np.log(1- eta[j][k])
+            bc = wcj + np.log(0.1)
+            p_y_x[i][j] = wcj + w0c
     
-    
-    return None
+    return p_y_x
 
 def avg_conditional_likelihood(bin_digits, labels, eta):
     '''
@@ -149,8 +144,13 @@ def classify_data(bin_digits, eta):
     Classify new points by taking the most likely posterior class
     '''
     cond_likelihood = conditional_likelihood(bin_digits, eta)
-    # Compute and return the most likely class
-    pass
+    n = bin_digits.shape[0]
+    new_points = np.zeros(n)
+    for i in range(0, n):
+        new_points[i] = cond_likelihood[i].argmin()
+    
+    
+    return new_points
 
 def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
@@ -159,10 +159,16 @@ def main():
     # Fit the model
     eta = compute_parameters(train_data, train_labels)
 
+    #Q2=------new images------
     # Evaluation
-    plot_images(eta)
+    #plot_images(eta)
 
-    generate_new_data(eta)
+    #generate_new_data(eta)
+    
+    #-------END Q2
+    
+    p = conditional_likelihood(train_data[0:2, 0:64], eta)
+    print p
 
 if __name__ == '__main__':
     main()

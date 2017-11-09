@@ -20,7 +20,7 @@
 \usepackage{listings}
 \usepackage{multicol}
 \usepackage{float}
-
+\usepackage{enumitem}
 
 \usepackage{bm}
 \date{\today}
@@ -41,8 +41,8 @@
 
 $P( \bm{x} | \ mu ,  \sigma) = $$\sum_{k = 1}^{K}$$  P( \bm{x} | y = k, \ mu ,  \sigma) P(y = k | \mu, \sigma) \\
 = $$  \sum_{k = 1}^{K}$$ \alpha_{k} P( \bm{x} | y = k, \ mu ,  \sigma) \\
-= $$ \sum_{k = 1}^{K}$$ \alpha_{k} (\prod_{i=1}^{D} 2\pi \sigma_{i})^{\frac{1}{2}} \\$
-\\
+= $$ \sum_{k = 1}^{K}$$ \alpha_{k} (\prod_{i=1}^{D} 2\pi \sigma_{i})^{\frac{1}{2}} exp\{{- \sum_{i=1}^{D}} \frac{1}{2 \sigma_{i} ^2} (x_{i} - \mu_{ki})^2 \}$
+
 \subsection{visualization}
 
 %\begin{equation*}
@@ -100,15 +100,73 @@ $
 \sigma_{i} ^2 = \frac{\sum_{i = 1}^{D} {\mathbb{1} ( i = k)} (x_{i} - \mu_{ki})^2}{\sum_{i=1}^{D} {\mathbb{1} ( i = k)}}
 $
 
+%%%%%%%%%%%%%%%%Q2%%%%%%%%%%%%%%%%%
+\section{Handwritten digits}
+\subsection{KNN}
+\begin{enumerate}
+\item Plot of digit means
+\end{enumerate}
 
-\subsubsection{Feature weights}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{q2_0_nums.png}
+\caption{\label{}}
+\end{figure}
 
 
 
+\subsubsection{KNN Euclidean}
+
+\begin{enumerate}[label=(\alph*)]
+\item K = 1, test accuracy = 0.96875, train accuracy = 1.0
+\item K = 15, test accuract = 0.9585 , train accuracy  = 0.959428571429 
+\end{enumerate}
+
+\subsubsection{Break ties}
+In my program, I have the array label\char`_count[0 , 10] in function def query\_knn(self, test\_point, k): that stores the number of neighbours with the digit label corresponding to the index of label\_count array. I find the maximum number in label\_count, and the index of the max is the majority vote. If there are multiple, the function label\_count.argmax() will pick the index that comes first. This is justified in class, we can break ties randomly or assign to the first maximum vote.
+
+\subsubsection{K = 1 to 15}
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c| } 
+ \hline
+ K & Training Accuracy & Average Fold & Test Accuracy \\ 
+ 1 & cell5  & 0.9644285714285715   & 0  \\ 
+ 2 & cell8   &  0.9575714285714285 & 0\\
+ 
+ \hline
+\end{tabular}
+\end{center}
+
+
+[0.9644285714285715, 0.9575714285714285, 0.9634285714285715, 0.961, 0.9608571428571429, 0.959, 0.957857142857143, 0.9574285714285715, 0.9555714285714286, 0.9528571428571428, 0.9522857142857143, 0.9514285714285714, 0.9504285714285714, 0.95]
+
+%%%%%%%%%%%%%Q 2.2 %%%%%%%%%%%%%%%%%%%
+\subsection{Conditional Gaussian}
+\subsubsection{Plot of log}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{log_sigma_k.png}
+\caption{\label{}}
+\end{figure}
 
 
 
+%%%%%%%%%%%%%%q2.3%%%%%%%%%%%%%%%
+\subsection{Naives Bayes}
+\subsubsection{Plot of $\eta$}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{q3_eta.png}
+\caption{\label{}}
+\end{figure}
 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{eta_plot.png}
+\caption{\label{}}
+\end{figure}
 
 
 % \section{Some examples to get started}

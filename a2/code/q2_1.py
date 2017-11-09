@@ -120,7 +120,7 @@ def main():
 
     #===========Q1,2--------#
     k_1_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
-    k_15_accuracy = classification_accuracy(knn, 15, test_data, test_labels)
+    k_15_accuracy = classification_accuracy(knn, 15, train_data, train_labels)
     print "k 1", k_1_accuracy
     
     print "k 15.", k_15_accuracy

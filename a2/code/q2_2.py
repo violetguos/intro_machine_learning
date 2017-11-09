@@ -128,37 +128,41 @@ def generative_likelihood_helper(digits, means, covariances):
     n = digits.shape[0]
     p_x = np.zeros((n,10))
 
-    for j in range(0, n):
-        for i in range(0, 10):
+    for i in range(0, n):
+        for j in range(0, 10):
             x = digits
 
-            pi_term =  pow((2*np.pi), -10/2)
-            det_term = np.linalg.det(covariances[i])
+            pi_term = (2* np.pi) #-10/2
+            det_term = np.linalg.det(covariances[j])
             #print "---------eig--------------"
             #print eig_term
             #eig_term = tuple_to_arr(eig_term, 64)
-            det_term_root = np.sqrt(det_term) #64 by 64
             #print eig_term_root
-            x_diff_miu = np.subtract(x[j], means[i])
+            x_diff_miu = np.subtract(x[i], means[j])
             
             #print x[j].shape #64
             #print means[i].shape #64
-            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.inv(covariances[i]) )
+            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.inv(covariances[j]) )
             exp_term = (-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
         
             #print "#dot 3 term....."
             #print exp_term
-            p_x1 = pi_term /det_term_root
             #print "-----------------------"
             #print "px1 dim", p_x1.shape 
             #print "-----------------------"
             #print "exp term", exp_term
            
-            log_p_x1 = np.log(p_x1)    
-            p_x[j][i] =  log_p_x1 * exp_term
+            p_x[i][j] = -(10 / 2) * pi_term\
+                        -0.5*np.log(det_term)\
+                        - 0.5*(exp_term)\
+                        #+ np.log(0.1)
+                        
+                        
+                        
         #ii += 1
 
     #p_x = p_x.T
+    print "----------in generative helper"
     print p_x
     return p_x
     
@@ -176,7 +180,7 @@ def generative_likelihood(digits, means, covariances):
     #print p_x.shape
     n = digits.shape[0]
     log_p_x = generative_likelihood_helper(digits, means, covariances)
-    print "-----------p x", log_p_x
+    #print "-----------p x", log_p_x
     #for i in range(0, n):
     #    for j in range(0, 10):
     #        log_p_x[i][j] = np.log(log_p_x[i][j])
@@ -196,20 +200,19 @@ def conditional_likelihood(digits, means, covariances):
     n = len(digits)
 
     p_x_y =generative_likelihood(digits, means, covariances)
-    print "-----------p x y", p_x_y
+    #print "-----------p x y", p_x_y
 
     p_x = 0 # =np.zeros(n) # p(x | sigma, miu)
     
     p_y_x = np.zeros((n, 10))
      
+    #print "------------------- p x---------------"
+    #print p_x
     for i in range(0, n):
+        p_x_y_sum =  np.sum(p_x_y[i])
+
         for j in range(0, 10):
-            p_x += 0.1 * p_x_y[i][j]
-    print "------------------- p x---------------"
-    print p_x
-    for i in range(0, n):
-        for j in range(0, 10):
-            p_y_x_ = p_x_y[i][j] + np.log(0.1) - n * np.log(0.1) - np.sum(p_x_y)
+            p_y_x_ = p_x_y[i][j] + np.log(0.1) - np.log(0.1*n) - np.log(p_x_y_sum)
             p_y_x[i][j] = (p_y_x_)
 
     #print p_y_x
@@ -228,12 +231,19 @@ def avg_conditional_likelihood(digits, labels, means, covariances):
     
     # Compute as described above and return
     n = len(digits)
-    avg_p_y = np.zeros((n, 1))
+    p_y = 0
+    avg_p_y = 0
     
     for i in range(0,n):
-        avg_item = np.mean(cond_likelihood[i,:])
-        avg_p_y[i] = avg_item
+        avg_item = (cond_likelihood[i,:])
+        cond_label = avg_item.argmin() #most probable, prediction
+        if cond_label == labels[i]:
+            p_y += cond_likelihood[i][cond_label]
     
+    avg_p_y  = p_y / n
+        
+    print "-------------in avg cond likelihood--------"
+    print avg_p_y
     return avg_p_y
 
 def classify_data(digits, means, covariances):
@@ -248,7 +258,7 @@ def classify_data(digits, means, covariances):
     for i in range(digits.shape[0]):
         #go through all n digits, pick the max out of 10
         class_i = cond_likelihood[i,:] #ith row, has 10 digits
-        max_class[i] = class_i.argmax() #or is it argmax
+        max_class[i] = class_i.argmin() #or is it argmax
     
     #print "-------------class i ", class_i, "  ", class_j
     #print cond_likelihood.shape
@@ -262,7 +272,10 @@ def main():
     # Fit the model
     #print train_data[0,:].shape
     #test_arr = train_data[101,:]
-    print "----------- test_data", test_data.shape[0] #[0] = 4000 #shape = 4000 by 64
+    #
+    #print "----------- test_data", test_data.shape[0] #[0] = 4000 #shape = 4000 by 64
+    
+    
     #print "test arr, ", test_arr, " test label ", test_labels[101],
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
@@ -283,6 +296,13 @@ def main():
         if c_predict[i] == test_labels[i]:
             accurate_class += 1
     print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
+    
+    
+    test = avg_conditional_likelihood(test_data, test_labels, means, covariances)
+    
+    #print "--------blablablabla", test
+    
+    
     
     
     #print np.sqrt(covariances[0][0])

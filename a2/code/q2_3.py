@@ -96,7 +96,7 @@ def generative_likelihood(bin_digits, eta):
             for k in range(0, 64):
                 wcj +=  bin_digits[i][k] * np.log((eta[j][k])/(1- eta[j][k]))
                 w0c += np.log(1- eta[j][k])
-            log_p_x[i][j] = wcj + w0c
+            log_p_x[i][j] = wcj  + w0c
             
     return log_p_x
 
@@ -110,10 +110,11 @@ def conditional_likelihood(bin_digits, eta):
     Where n is the number of datapoints and 10 corresponds to each digit class
     '''
     n = bin_digits.shape[0]
-    print "n",n, "  ", bin_digits.shape[1]
-    p_y_x = np.zeros((n,10))
+    #print "n",n, "  ", bin_digits.shape[1]
     
+    p_y_x= generative_likelihood(bin_digits, eta)
     #P(y = c | x , theta) = 0.1 * p(x| y = c)
+    '''
     for i in range(0, n):
         for j in range(0, 10):
             w0c = 0
@@ -121,9 +122,13 @@ def conditional_likelihood(bin_digits, eta):
             for k in range(0, 64):
                 wcj +=  bin_digits[i][k] * np.log((eta[j][k])/(1- eta[j][k]))
                 w0c += np.log(1- eta[j][k])
-            bc = wcj + np.log(0.1)
-            p_y_x[i][j] = wcj + w0c
-    
+    '''
+    bc = np.log(0.1)
+    #print "-------in cond likelihood"
+    #print "-----before add"
+    #print p_y_x
+    p_y_x[:] += bc
+    #print p_y_x
     return p_y_x
 
 def avg_conditional_likelihood(bin_digits, labels, eta):
@@ -147,6 +152,7 @@ def classify_data(bin_digits, eta):
     n = bin_digits.shape[0]
     new_points = np.zeros(n)
     for i in range(0, n):
+        print cond_likelihood[i]
         new_points[i] = cond_likelihood[i].argmin()
     
     
@@ -167,8 +173,17 @@ def main():
     
     #-------END Q2
     
-    p = conditional_likelihood(train_data[0:2, 0:64], eta)
-    print p
+    #---------Q3
+    c_predict =  classify_data(train_data[0:10, 0:64], eta)
+    #p = conditional_likelihood(train_data[0:2, 0:64], eta)
+    #print p
+    accurate_class = 0
+    for i in range(2):#len(test_labels)):
+        if c_predict[i] == test_labels[i]:
+            accurate_class += 1
+    
+    print "-------classify accuracy", (1.0 * accurate_class / 10)#len(train_labels))
+
 
 if __name__ == '__main__':
     main()

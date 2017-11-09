@@ -138,13 +138,31 @@ def generative_likelihood_helper(digits, means, covariances):
             #print eig_term
             #eig_term = tuple_to_arr(eig_term, 64)
             #print eig_term_root
-            x_diff_miu = np.subtract(x[i], means[j])
+            #print "================x[i]"
+            #print x[i]
+            #print "=================means[j]"
+            #print means[j]
             
+            #print "==============x diff miu"
+            x_diff_miu = np.subtract(x[i], means[j])
+            #print x_diff_miu
+            #print("  ")    
             #print x[j].shape #64
             #print means[i].shape #64
-            x_miu_x_sigmak = np.dot(x_diff_miu.T, np.linalg.inv(covariances[j]) )
-            exp_term = (-0.5* np.dot(x_miu_x_sigmak, x_diff_miu)) 
-        
+            #print "===============covariance"
+            #print covariances[j]
+            inv_term = np.linalg.inv(covariances[j])
+            #print "=================inv_term"
+            #print inv_term
+            #print "                              "
+            
+            #print "===================x miu x sigma k"
+            x_miu_x_sigmak = np.dot(np.transpose(x_diff_miu), inv_term)
+            #print x_miu_x_sigmak
+            #print "                   "
+            #print "=========================exp_term"
+            exp_term = np.dot(x_miu_x_sigmak, x_diff_miu)
+            #print exp_term
             #print "#dot 3 term....."
             #print exp_term
             #print "-----------------------"
@@ -152,9 +170,9 @@ def generative_likelihood_helper(digits, means, covariances):
             #print "-----------------------"
             #print "exp term", exp_term
            
-            p_x[i][j] = -(10 / 2) * pi_term\
+            p_x[i][j] = -(10 / 2) * np.log(pi_term)\
                         -0.5*np.log(det_term)\
-                        - 0.5*(exp_term)\
+                        -0.5*(exp_term)\
                         #+ np.log(0.1)
                         
                         
@@ -163,7 +181,7 @@ def generative_likelihood_helper(digits, means, covariances):
 
     #p_x = p_x.T
     print "----------in generative helper"
-    print p_x
+    print np.exp(p_x)
     return p_x
     
     
@@ -199,24 +217,28 @@ def conditional_likelihood(digits, means, covariances):
     '''
     n = len(digits)
 
-    p_x_y =generative_likelihood(digits, means, covariances)
-    #print "-----------p x y", p_x_y
-
-    p_x = 0 # =np.zeros(n) # p(x | sigma, miu)
-    
-    p_y_x = np.zeros((n, 10))
+    log_pxy_gen =generative_likelihood(digits, means, covariances)
+    log_pyx_cond = np.zeros((n, 10))
      
     #print "------------------- p x---------------"
     #print p_x
     for i in range(0, n):
-        p_x_y_sum =  np.sum(p_x_y[i])
-
+        p_x_y_=  np.exp(log_pxy_gen[i])
+        p_x_y_ = p_x_y_ * 0.1
+        
+        p_x_y_sum = np.sum(p_x_y_)
+        #print "=============in cond likelihood"
+        #print "p_x_y", p_x_y
+        #print "       "
+        #print "p_x_y_sum",  p_x_y_sum
         for j in range(0, 10):
-            p_y_x_ = p_x_y[i][j] + np.log(0.1) - np.log(0.1*n) - np.log(p_x_y_sum)
-            p_y_x[i][j] = (p_y_x_)
+            p_y_x_ = log_pxy_gen[i][j] + np.log(0.1) - np.log(p_x_y_sum)
+            log_pyx_cond[i][j] = (p_y_x_)
 
-    #print p_y_x
-    return p_y_x
+    #test_p_y_x = np.exp(p_y_x)
+    print "-----------test p y x -----------"
+    print log_pyx_cond
+    return log_pyx_cond
 
 def avg_conditional_likelihood(digits, labels, means, covariances):
     #(digits, labels, means, covariances):
@@ -236,9 +258,9 @@ def avg_conditional_likelihood(digits, labels, means, covariances):
     
     for i in range(0,n):
         avg_item = (cond_likelihood[i,:])
-        cond_label = avg_item.argmin() #most probable, prediction
-        if cond_label == labels[i]:
-            p_y += cond_likelihood[i][cond_label]
+        #cond_label = avg_item.argmin() #most probable, prediction
+        cond_label = labels[i]
+        p_y += cond_likelihood[i][int(cond_label)]
     
     avg_p_y  = p_y / n
         
@@ -251,7 +273,7 @@ def classify_data(digits, means, covariances):
     Classify new points by taking the most likely posterior class
     '''
     cond_likelihood = conditional_likelihood(digits, means, covariances)
-    print "------cond likelihood----- ", cond_likelihood[0]
+    #print "------cond likelihood----- ", cond_likelihood[0]
     n  = digits.shape[0]
     max_class = np.zeros(n)
     # Compute and return the most likely class

@@ -90,14 +90,17 @@ def generative_likelihood(bin_digits, eta):
     n = bin_digits.shape[0]
     log_p_x = np.zeros((n, 10))
     for i in range(0,n):
+
         for j in range(0, 10):
             w0c = 0
             wcj = 0
-            for k in range(0, 64):
-                wcj +=  bin_digits[i][k] * np.log((eta[j][k])/(1- eta[j][k]))
+            for k in range(0,64):
+                log_eta = np.log((eta[j][k])/(1- eta[j][k])) 
+                wcj += bin_digits[i][k] *log_eta
                 w0c += np.log(1- eta[j][k])
-            log_p_x[i][j] = wcj  + w0c
             
+            log_p_x[i][j] = wcj  + w0c
+    print log_p_x     
     return log_p_x
 
 def conditional_likelihood(bin_digits, eta):
@@ -152,8 +155,8 @@ def classify_data(bin_digits, eta):
     n = bin_digits.shape[0]
     new_points = np.zeros(n)
     for i in range(0, n):
-        print cond_likelihood[i]
-        new_points[i] = cond_likelihood[i].argmin()
+        #print cond_likelihood[i]
+        new_points[i] = cond_likelihood[i].argmax()
     
     
     return new_points
@@ -174,15 +177,15 @@ def main():
     #-------END Q2
     
     #---------Q3
-    c_predict =  classify_data(train_data[0:10, 0:64], eta)
+    c_predict =  classify_data(train_data, eta)
     #p = conditional_likelihood(train_data[0:2, 0:64], eta)
     #print p
     accurate_class = 0
-    for i in range(2):#len(test_labels)):
+    for i in range(len(test_labels)):
         if c_predict[i] == test_labels[i]:
             accurate_class += 1
     
-    print "-------classify accuracy", (1.0 * accurate_class / 10)#len(train_labels))
+    print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
 
 
 if __name__ == '__main__':

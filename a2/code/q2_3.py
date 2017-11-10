@@ -90,7 +90,6 @@ def generative_likelihood(bin_digits, eta):
     n = bin_digits.shape[0]
     log_p_x = np.zeros((n, 10))
     for i in range(0,n):
-
         for j in range(0, 10):
             w0c = 0
             wcj = 0
@@ -146,7 +145,7 @@ def avg_conditional_likelihood(bin_digits, labels, eta):
 
     
     # Compute as described above and return
-    n = len(digits)
+    n = len(bin_digits)
     p_y = 0
     avg_p_y = 0
     
@@ -201,7 +200,8 @@ def main():
             accurate_class += 1
     
     print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
-
-
+    
+    p1 = avg_conditional_likelihood(test_data, test_labels, eta)
+    p2 = avg_conditional_likelihood(train_data, train_labels, eta)
 if __name__ == '__main__':
     main()

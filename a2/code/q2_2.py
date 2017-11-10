@@ -141,7 +141,7 @@ def generative_likelihood(digits, means, covariances):
             x = digits
 
             pi_term = (2* np.pi) #-10/2
-            det_term = np.linalg.det(covariances[j])
+            
             #print "================x[i]"
             #print x[i]
             #print "=================means[j]"
@@ -156,6 +156,7 @@ def generative_likelihood(digits, means, covariances):
             #print "===============covariance"
             #print covariances[j]
             inv_term = np.linalg.inv(covariances[j])
+            det_term = np.linalg.det(inv_term)
             #print "=================inv_term"
             #print inv_term
             #print "                              "
@@ -203,25 +204,27 @@ def conditional_likelihood(digits, means, covariances):
     #print "------------------- p x---------------"
     #print p_x
     for i in range(0, n):
-        print "=============in cond likelihood"
-        print log_pxy_gen[i].shape
-        print "  "
+        #print "=============in cond likelihood"
+        #print log_pxy_gen[i].shape
+        #print "  "
         p_x_y_=  np.exp(log_pxy_gen[i])
         
-        p_x_y_ = p_x_y_ * 0.1
-        print "=============in cond likelihood"
-        print "p_x_y", p_x_y_
+        p_x_y_ = p_x_y_ * 0.1 #verfied dim 10
+        #print "=============in cond likelihood pxy shape"
+        #print p_x_y_.shape
+        #print "=============in cond likelihood"
+        #print "p_x_y", p_x_y_
         p_x_y_sum = np.sum(p_x_y_)
 
-        print "       "
-        print "p_x_y_sum",  p_x_y_sum
+        #print "       "
+        #print "p_x_y_sum",  p_x_y_sum
         for j in range(0, 10):
             p_y_x_ = log_pxy_gen[i][j] + np.log(0.1) - np.log(p_x_y_sum)
             log_pyx_cond[i][j] = (p_y_x_)
 
     #test_p_y_x = np.exp(p_y_x)
-    print "-----------test p y x -----------"
-    print log_pyx_cond
+    #print "-----------test p y x -----------"
+    #print log_pyx_cond
     return log_pyx_cond
 
 def avg_conditional_likelihood(digits, labels, means, covariances):
@@ -263,7 +266,7 @@ def classify_data(digits, means, covariances):
     for i in range(digits.shape[0]):
         #go through all n digits, pick the max out of 10
         class_i = cond_likelihood[i,:] #ith row, has 10 digits
-        max_class[i] = class_i.argmin() #or is it argmax
+        max_class[i] = class_i.argmax() #or is it argmax
     
     #print "-------------class i ", class_i, "  ", class_j
     #print cond_likelihood.shape
@@ -295,7 +298,7 @@ def main():
     
     #the final code for classify but need to get everything work now
     accurate_class = 0
-    c_predict = classify_data(test_data[0:2, 0:64], means, covariances)
+    c_predict = classify_data(test_data, means, covariances)
 
     for i in range(len(test_labels)):
         if c_predict[i] == test_labels[i]:

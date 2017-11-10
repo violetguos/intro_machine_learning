@@ -156,13 +156,15 @@ def generative_likelihood(digits, means, covariances):
             #print "===============covariance"
             #print covariances[j]
             inv_term = np.linalg.inv(covariances[j])
-            det_term = np.linalg.det(inv_term)
+            det_term = np.linalg.det(covariances[j])
+            #det_root = np.sqrt(det_term)
+            #inv_det_root = np.linalg.inv(det_root)
             #print "=================inv_term"
             #print inv_term
             #print "                              "
             
             #print "===================x miu x sigma k"
-            x_miu_x_sigmak = np.dot(np.transpose(x_diff_miu), inv_term)
+            x_miu_x_sigmak = np.dot(np.transpose(x_diff_miu), inv_term) #MATMUL
             #print x_miu_x_sigmak
             #print "                   "
             #print "=========================exp_term"
@@ -174,10 +176,12 @@ def generative_likelihood(digits, means, covariances):
             #print "px1 dim", p_x1.shape 
             #print "-----------------------"
             #print "exp term", exp_term
-           
-            p_x[i][j] = -(10 / 2) * np.log(pi_term)\
+            #TODO: 64
+            p_x[i][j] = -(64 / 2) * np.log(pi_term)\
                         -0.5*np.log(det_term)\
-                        -0.5*(exp_term)\
+                        -0.5*(exp_term)
+                        
+                        #np.log(inv_det_root)
                         #+ np.log(0.1)
             
     #p_x = p_x.T
@@ -199,28 +203,28 @@ def conditional_likelihood(digits, means, covariances):
     n = len(digits)
 
     log_pxy_gen =generative_likelihood(digits, means, covariances)
-    log_pyx_cond = np.zeros((n, 10))
+    log_pyx_cond = log_pxy_gen + np.log(0.1)
      
     #print "------------------- p x---------------"
     #print p_x
-    for i in range(0, n):
+    #for i in range(0, n):
         #print "=============in cond likelihood"
         #print log_pxy_gen[i].shape
         #print "  "
-        p_x_y_=  np.exp(log_pxy_gen[i])
+        #p_x_y_=  np.exp(log_pxy_gen[i])
         
-        p_x_y_ = p_x_y_ * 0.1 #verfied dim 10
+        #p_x_y_ = p_x_y_ * 0.1 #verfied dim 10
         #print "=============in cond likelihood pxy shape"
         #print p_x_y_.shape
         #print "=============in cond likelihood"
         #print "p_x_y", p_x_y_
-        p_x_y_sum = np.sum(p_x_y_)
+        #p_x_y_sum = np.sum(p_x_y_)
 
         #print "       "
         #print "p_x_y_sum",  p_x_y_sum
-        for j in range(0, 10):
-            p_y_x_ = log_pxy_gen[i][j] + np.log(0.1) - np.log(p_x_y_sum)
-            log_pyx_cond[i][j] = (p_y_x_)
+        #for j in range(0, 10):
+        #    p_y_x_ = log_pxy_gen[i][j] + np.log(0.1) - np.log(p_x_y_sum)
+        #    log_pyx_cond[i][j] = (p_y_x_)
 
     #test_p_y_x = np.exp(p_y_x)
     #print "-----------test p y x -----------"
@@ -248,7 +252,7 @@ def avg_conditional_likelihood(digits, labels, means, covariances):
         cond_label = labels[i]
         p_y += cond_likelihood[i][int(cond_label)]
     
-    avg_p_y  = p_y / n
+    avg_p_y = p_y / n
         
     print "-------------in avg cond likelihood--------"
     print avg_p_y
@@ -259,14 +263,15 @@ def classify_data(digits, means, covariances):
     Classify new points by taking the most likely posterior class
     '''
     cond_likelihood = conditional_likelihood(digits, means, covariances)
+    cond_exp = np.exp(cond_likelihood)
     #print "------cond likelihood----- ", cond_likelihood[0]
     n  = digits.shape[0]
-    max_class = np.zeros(n)
+    max_class = []
     # Compute and return the most likely class
-    for i in range(digits.shape[0]):
+    for class_i in cond_exp:
         #go through all n digits, pick the max out of 10
-        class_i = cond_likelihood[i,:] #ith row, has 10 digits
-        max_class[i] = class_i.argmax() #or is it argmax
+         #= cond_exp[i,:] #ith row, has 10 digits
+        max_class.append(np.argmax(class_i)) #or is it argmax
     
     #print "-------------class i ", class_i, "  ", class_j
     #print cond_likelihood.shape
@@ -303,7 +308,7 @@ def main():
     for i in range(len(test_labels)):
         if c_predict[i] == test_labels[i]:
             accurate_class += 1
-    print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
+    print "-------classify accuracy", (1.0 * accurate_class / (test_labels.shape[0]))
     
     
     test = avg_conditional_likelihood(test_data, test_labels, means, covariances)

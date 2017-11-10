@@ -68,12 +68,16 @@ def generate_new_data(eta):
 
     for i in range(0, 10):
         for j in range(0, 64):
-            if eta[i][j] < 0.5:
+            if eta[i][j] > 0.5:
                 b_j = 1
             else:
                 b_j = 0
-            generated_data[i][j] = pow(eta[i][j], b_j) *\
-                                    pow((1-eta[i][j]),(1 -b_j))
+            #generated_data[i][j] = pow(eta[i][j], b_j) *\
+                                    #pow((1-eta[i][j]),(1 -b_j))
+            generated_data[i][j] = b_j
+            
+
+    
             
     plot_images(generated_data)
 
@@ -92,14 +96,13 @@ def generative_likelihood(bin_digits, eta):
     for i in range(0,n):
         for j in range(0, 10):
             w0c = 0
-            wcj = 0
             for k in range(0,64):
-                log_eta = np.log((eta[j][k])/(1- eta[j][k])) 
-                wcj += bin_digits[i][k] *log_eta
-                w0c += np.log(1- eta[j][k])
+                nkj = (eta[j][k]) **(bin_digits[i][k]) 
+                one_min_nkj = (1 -eta[j][k]) **(1 -  bin_digits[i][k]) 
+                w0c += (np.log(nkj) + np.log(one_min_nkj))
+            log_p_x[i][j] = w0c
             
-            log_p_x[i][j] = wcj  + w0c
-    print log_p_x     
+    #print log_p_x     
     return log_p_x
 
 def conditional_likelihood(bin_digits, eta):
@@ -129,7 +132,7 @@ def conditional_likelihood(bin_digits, eta):
     #print "-------in cond likelihood"
     #print "-----before add"
     #print p_y_x
-    p_y_x[:] += bc
+    p_y_x += bc
     #print p_y_x
     return p_y_x
 
@@ -157,8 +160,8 @@ def avg_conditional_likelihood(bin_digits, labels, eta):
     
     avg_p_y  = p_y / n
         
-    print "-------------in avg cond likelihood--------"
-    print avg_p_y
+    #print "-------------in avg cond likelihood--------"
+    #print avg_p_y
     return avg_p_y
 
 def classify_data(bin_digits, eta):
@@ -170,7 +173,8 @@ def classify_data(bin_digits, eta):
     new_points = np.zeros(n)
     for i in range(0, n):
         #print cond_likelihood[i]
-        new_points[i] = cond_likelihood[i].argmax()
+        test = cond_likelihood[i]
+        new_points[i] =np.argmax(test)
     
     
     return new_points
@@ -184,9 +188,12 @@ def main():
 
     #Q2=------new images------
     # Evaluation
-    #plot_images(eta)
+    print "eta image"
+    plot_images(eta)
+    print "eta0", eta[0]
 
-    #generate_new_data(eta)
+    print "new sample image"
+    generate_new_data(eta)
     
     #-------END Q2
     
@@ -195,13 +202,13 @@ def main():
     #p = conditional_likelihood(train_data[0:2, 0:64], eta)
     #print p
     accurate_class = 0
-    for i in range(len(test_labels)):
+    for i in range(test_labels.shape[0]):
         if c_predict[i] == test_labels[i]:
             accurate_class += 1
     
-    print "-------classify accuracy", (1.0 * accurate_class / len(train_labels))
+    print "-------classify accuracy", (1.0 * accurate_class / len(test_labels))
     
-    p1 = avg_conditional_likelihood(test_data, test_labels, eta)
-    p2 = avg_conditional_likelihood(train_data, train_labels, eta)
+    #p1 = avg_conditional_likelihood(test_data, test_labels, eta)
+    #   p2 = avg_conditional_likelihood(train_data, train_labels, eta)
 if __name__ == '__main__':
     main()

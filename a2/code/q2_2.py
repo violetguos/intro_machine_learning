@@ -41,9 +41,6 @@ def compute_mean_mles(train_data, train_labels):
     for i in range(0, 10):
         i_mean_matrix = np.zeros((8,8))
         i_digits = data.get_digits_by_label(train_data, train_labels, i)
-        # Compute mean of class i
-        #TODO: compute 64 by 64 matrix mean??
-        #700 row, 64 columns for each difit
 
         means[i] = mean_i_digit(i_digits) #imean is 64
         
@@ -98,10 +95,7 @@ def compute_sigma_mles(train_data, train_labels):
                 covariances[i][ii][jj] = i_cov_column
             iden_matrix = 0.01*np.identity(64)
             np.add(iden_matrix, covariances[i])
-        #test_cov[i] =np.cov(i_digits.T)
-    #test_cov = test_cov.reshape(test_cov.shape[0],\
-                                      #test_cov.shape[1]*test_cov.shape[2])
-    #np.savetxt('h1.txt',test_cov,fmt='%.5f',delimiter=',')    
+      
     
 
     return covariances
@@ -141,42 +135,17 @@ def generative_likelihood(digits, means, covariances):
             x = digits
 
             pi_term = (2* np.pi) #-10/2
-            
-            #print "================x[i]"
-            #print x[i]
-            #print "=================means[j]"
-            #print means[j]
-            
-            #print "==============x diff miu"
+
             x_diff_miu = np.subtract(x[i], means[j])
-            #print x_diff_miu
-            #print("  ")    
-            #print x[j].shape #64
-            #print means[i].shape #64
-            #print "===============covariance"
-            #print covariances[j]
+
             inv_term = np.linalg.inv(covariances[j])
             det_term = np.linalg.det(covariances[j])
-            #det_root = np.sqrt(det_term)
-            #inv_det_root = np.linalg.inv(det_root)
-            #print "=================inv_term"
-            #print inv_term
-            #print "                              "
-            
-            #print "===================x miu x sigma k"
+      
             x_miu_x_sigmak = np.dot(np.transpose(x_diff_miu), inv_term) #MATMUL
             #print x_miu_x_sigmak
-            #print "                   "
-            #print "=========================exp_term"
+      
             exp_term = np.dot(x_miu_x_sigmak, x_diff_miu)
-            #print exp_term
-            #print "#dot 3 term....."
-            #print exp_term
-            #print "-----------------------"
-            #print "px1 dim", p_x1.shape 
-            #print "-----------------------"
-            #print "exp term", exp_term
-            #TODO: 64
+
             p_x[i][j] = -(64 / 2) * np.log(pi_term)\
                         -0.5*np.log(det_term)\
                         -0.5*(exp_term)
@@ -205,30 +174,7 @@ def conditional_likelihood(digits, means, covariances):
     log_pxy_gen =generative_likelihood(digits, means, covariances)
     log_pyx_cond = log_pxy_gen + np.log(0.1)
      
-    #print "------------------- p x---------------"
-    #print p_x
-    #for i in range(0, n):
-        #print "=============in cond likelihood"
-        #print log_pxy_gen[i].shape
-        #print "  "
-        #p_x_y_=  np.exp(log_pxy_gen[i])
-        
-        #p_x_y_ = p_x_y_ * 0.1 #verfied dim 10
-        #print "=============in cond likelihood pxy shape"
-        #print p_x_y_.shape
-        #print "=============in cond likelihood"
-        #print "p_x_y", p_x_y_
-        #p_x_y_sum = np.sum(p_x_y_)
-
-        #print "       "
-        #print "p_x_y_sum",  p_x_y_sum
-        #for j in range(0, 10):
-        #    p_y_x_ = log_pxy_gen[i][j] + np.log(0.1) - np.log(p_x_y_sum)
-        #    log_pyx_cond[i][j] = (p_y_x_)
-
-    #test_p_y_x = np.exp(p_y_x)
-    #print "-----------test p y x -----------"
-    #print log_pyx_cond
+   
     return log_pyx_cond
 
 def avg_conditional_likelihood(digits, labels, means, covariances):
@@ -272,66 +218,50 @@ def classify_data(digits, means, covariances):
         #go through all n digits, pick the max out of 10
          #= cond_exp[i,:] #ith row, has 10 digits
         max_class.append(np.argmax(class_i)) #or is it argmax
-    
-    #print "-------------class i ", class_i, "  ", class_j
-    #print cond_likelihood.shape
+
     return max_class
 
-
+def classify_accuracy(predict_label, real_label, n):
+    accurate_class = 0
+    for i in range(0,n):
+        if predict_label[i] == real_label[i]:
+            accurate_class += 1
+    print "-------classify accuracy", (1.0 * accurate_class / n)
+    
 
 def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
 
     # Fit the model
-    #print train_data[0,:].shape
-    #test_arr = train_data[101,:]
-    #
-    #print "----------- test_data", test_data.shape[0] #[0] = 4000 #shape = 4000 by 64
-    
-    
-    #print "test arr, ", test_arr, " test label ", test_labels[101],
     means = compute_mean_mles(train_data, train_labels)
     covariances = compute_sigma_mles(train_data, train_labels)
+    print "============Q2.2 Part1 plot of log of Sigma_k diagonal"
+    plot_cov_diagonal(covariances)
     
-    #print means.shape (64,)
-    #print covariances.shape (10, 64, 64)
+    print "============Q2.2 part2 average log likelihood========"
+    print "===========Train data average log likelihood========="
+    avg_train = avg_conditional_likelihood(train_data, train_labels, means, covariances)
+    
+    print "===========Test data average log likelihood ========"
+    avg_test = avg_conditional_likelihood(test_data, test_labels, means, covariances)
     
     
-    
-    #p = conditional_likelihood(train_data[0:2, 0:64], means, covariances)
-    #print p
     
     #the final code for classify but need to get everything work now
-    accurate_class = 0
-    c_predict = classify_data(test_data, means, covariances)
+    print "=============Q2.2 part3 prediction and accuracy of each predication======"
+    print "=============Train data prediction and accuracy========"
+    train_predict =  classify_data(train_data, means, covariances)
+    n_dim_train = train_labels.shape[0]
+    classify_accuracy(train_predict, train_labels, n_dim_train)
+    
+    print "=============Test data prediction and accuracy========="
+    test_predict = classify_data(test_data, means, covariances)
+    n_dim_test = test_labels.shape[0]
+    classify_accuracy(test_predict, test_labels,n_dim_test )
 
-    for i in range(len(test_labels)):
-        if c_predict[i] == test_labels[i]:
-            accurate_class += 1
-    print "-------classify accuracy", (1.0 * accurate_class / (test_labels.shape[0]))
+   
     
     
-    test = avg_conditional_likelihood(test_data, test_labels, means, covariances)
-    
-    #print "--------blablablabla", test
-    
-    
-    
-    
-    #print np.sqrt(covariances[0][0])
-    #eig_term = np.linalg.eig(covariances[0])
-    #print "eig value", eig_term
-    
-    #a = np.arange(16).reshape(4, 4)
-    #aa, b = np.linalg.eig(a)
-    #print "before", b
-    #b = tuple_to_arr(b)
-    #print "after", b
-    #covariances = covariances.reshape(covariances.shape[0],\
-                                      #covariances.shape[1]*covariances.shape[2])
-    #np.savetxt('h.txt',covariances,fmt='%.5f',delimiter=',')
-
-    #plot_cov_diagonal(covariances)
-    #generative_likelihood((train_data, train_labels), means, covariances)
+   
 if __name__ == '__main__':
     main()

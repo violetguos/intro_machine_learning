@@ -123,8 +123,16 @@ def plot_cov_diagonal(covariances):
     plt.show()
     
     
+    
+    
+def generative_likelihood(digits, means, covariances):
+    '''
+    Compute the generative log-likelihood:
+        log p(x|y,mu,Sigma)
 
-def generative_likelihood_helper(digits, means, covariances):
+    Should return an n x 10 numpy array 
+    '''
+ 
     n = digits.shape[0]
     p_x = np.zeros((n,10))
 
@@ -134,10 +142,6 @@ def generative_likelihood_helper(digits, means, covariances):
 
             pi_term = (2* np.pi) #-10/2
             det_term = np.linalg.det(covariances[j])
-            #print "---------eig--------------"
-            #print eig_term
-            #eig_term = tuple_to_arr(eig_term, 64)
-            #print eig_term_root
             #print "================x[i]"
             #print x[i]
             #print "=================means[j]"
@@ -174,37 +178,13 @@ def generative_likelihood_helper(digits, means, covariances):
                         -0.5*np.log(det_term)\
                         -0.5*(exp_term)\
                         #+ np.log(0.1)
-                        
-                        
-                        
-        #ii += 1
-
+            
     #p_x = p_x.T
-    print "----------in generative helper"
-    print np.exp(p_x)
+    #print "----------in generative helper"
+    #print np.exp(p_x)
     return p_x
-    
-    
-def generative_likelihood(digits, means, covariances):
-    '''
-    Compute the generative log-likelihood:
-        log p(x|y,mu,Sigma)
 
-    Should return an n x 10 numpy array 
-    '''
- 
-    #print "---------"
-    #print p_x
-    #print p_x.shape
-    n = digits.shape[0]
-    log_p_x = generative_likelihood_helper(digits, means, covariances)
-    #print "-----------p x", log_p_x
-    #for i in range(0, n):
-    #    for j in range(0, 10):
-    #        log_p_x[i][j] = np.log(log_p_x[i][j])
-    
-    
-    return log_p_x
+
 
 def conditional_likelihood(digits, means, covariances):
     '''
@@ -223,14 +203,18 @@ def conditional_likelihood(digits, means, covariances):
     #print "------------------- p x---------------"
     #print p_x
     for i in range(0, n):
+        print "=============in cond likelihood"
+        print log_pxy_gen[i].shape
+        print "  "
         p_x_y_=  np.exp(log_pxy_gen[i])
-        p_x_y_ = p_x_y_ * 0.1
         
+        p_x_y_ = p_x_y_ * 0.1
+        print "=============in cond likelihood"
+        print "p_x_y", p_x_y_
         p_x_y_sum = np.sum(p_x_y_)
-        #print "=============in cond likelihood"
-        #print "p_x_y", p_x_y
-        #print "       "
-        #print "p_x_y_sum",  p_x_y_sum
+
+        print "       "
+        print "p_x_y_sum",  p_x_y_sum
         for j in range(0, 10):
             p_y_x_ = log_pxy_gen[i][j] + np.log(0.1) - np.log(p_x_y_sum)
             log_pyx_cond[i][j] = (p_y_x_)
@@ -257,7 +241,6 @@ def avg_conditional_likelihood(digits, labels, means, covariances):
     avg_p_y = 0
     
     for i in range(0,n):
-        avg_item = (cond_likelihood[i,:])
         #cond_label = avg_item.argmin() #most probable, prediction
         cond_label = labels[i]
         p_y += cond_likelihood[i][int(cond_label)]
@@ -312,7 +295,7 @@ def main():
     
     #the final code for classify but need to get everything work now
     accurate_class = 0
-    c_predict = classify_data(test_data, means, covariances)
+    c_predict = classify_data(test_data[0:2, 0:64], means, covariances)
 
     for i in range(len(test_labels)):
         if c_predict[i] == test_labels[i]:

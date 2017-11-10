@@ -144,8 +144,23 @@ def avg_conditional_likelihood(bin_digits, labels, eta):
     '''
     cond_likelihood = conditional_likelihood(bin_digits, eta)
 
+    
     # Compute as described above and return
-    return None
+    n = len(digits)
+    p_y = 0
+    avg_p_y = 0
+    
+    for i in range(0,n):
+        avg_item = (cond_likelihood[i,:])
+        #cond_label = avg_item.argmin() #most probable, prediction
+        cond_label = labels[i]
+        p_y += cond_likelihood[i][int(cond_label)]
+    
+    avg_p_y  = p_y / n
+        
+    print "-------------in avg cond likelihood--------"
+    print avg_p_y
+    return avg_p_y
 
 def classify_data(bin_digits, eta):
     '''
@@ -177,7 +192,7 @@ def main():
     #-------END Q2
     
     #---------Q3
-    c_predict =  classify_data(train_data, eta)
+    c_predict =  classify_data(test_data, eta)
     #p = conditional_likelihood(train_data[0:2, 0:64], eta)
     #print p
     accurate_class = 0

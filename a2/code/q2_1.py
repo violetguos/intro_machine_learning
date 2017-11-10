@@ -68,7 +68,7 @@ class KNearestNeighbor(object):
 
         return digit
 
-def cross_validation(train_data, train_labels, k_range=np.arange(1,15)):
+def cross_validation(train_data, train_labels, k_range=np.arange(1,16)):
     all_k = []
     for k in k_range:
         # Loop over folds
@@ -83,7 +83,15 @@ def cross_validation(train_data, train_labels, k_range=np.arange(1,15)):
             k_train_accuracy.append(classification_accuracy(knn_new ,k, x_test, y_test))
         k_accuracy = (1.0 *sum(k_train_accuracy)) / (1.0 *len(k_train_accuracy))   
         all_k.append(k_accuracy)
-    print all_k
+    
+    
+    
+    print "========== K  & average across fold"
+    for knum in range(0, 15):
+        print (knum + 1)," & ", all_k[knum]
+    
+    
+    
     all_k = np.array(all_k)
     optimal_k = all_k.argmax()
     return optimal_k
@@ -119,11 +127,20 @@ def main():
 
 
     #===========Q1,2--------#
-    k_1_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
-    k_15_accuracy = classification_accuracy(knn, 15, train_data, train_labels)
-    print "k 1", k_1_accuracy
+    #k_1_accuracy = classification_accuracy(knn, 1, test_data, test_labels)
+    #k_15_accuracy = classification_accuracy(knn, 15, train_data, train_labels)
     
-    print "k 15.", k_15_accuracy
+    
+    print "=======K, traning accuracy, test accuracy===="
+    for knum in range(1, 16):
+        test_acc = classification_accuracy(knn, knum, test_data, test_labels)
+        train_acc = classification_accuracy(knn, knum, train_data, train_labels)
+        print knum," & ", train_acc, " & ", test_acc 
+    
+    
+    #print "k 1", k_1_accuracy
+    
+    #print "k 15.", k_15_accuracy
     
     #-----------------Q3---------------#
     opti_k_index = cross_validation(train_data, train_labels)

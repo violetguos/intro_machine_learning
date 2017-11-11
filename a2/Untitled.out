@@ -3,13 +3,17 @@
 \BOOKMARK [2][-]{subsection.1.2}{visualization}{section.1}% 3
 \BOOKMARK [2][-]{subsection.1.3}{visualization}{section.1}% 4
 \BOOKMARK [2][-]{subsection.1.4}{visualization}{section.1}% 5
-\BOOKMARK [2][-]{subsection.1.5}{visualization}{section.1}% 6
-\BOOKMARK [1][-]{section.2}{Handwritten digits}{}% 7
-\BOOKMARK [2][-]{subsection.2.1}{KNN}{section.2}% 8
-\BOOKMARK [3][-]{subsubsection.2.1.1}{KNN Euclidean}{subsection.2.1}% 9
-\BOOKMARK [3][-]{subsubsection.2.1.2}{Break ties}{subsection.2.1}% 10
-\BOOKMARK [3][-]{subsubsection.2.1.3}{K = 1 to 15}{subsection.2.1}% 11
-\BOOKMARK [2][-]{subsection.2.2}{Conditional Gaussian}{section.2}% 12
-\BOOKMARK [3][-]{subsubsection.2.2.1}{Plot of log}{subsection.2.2}% 13
-\BOOKMARK [2][-]{subsection.2.3}{Naives Bayes}{section.2}% 14
-\BOOKMARK [3][-]{subsubsection.2.3.1}{Plot of }{subsection.2.3}% 15
+\BOOKMARK [1][-]{section.2}{Handwritten digits}{}% 6
+\BOOKMARK [2][-]{subsection.2.1}{KNN}{section.2}% 7
+\BOOKMARK [3][-]{subsubsection.2.1.1}{KNN Euclidean}{subsection.2.1}% 8
+\BOOKMARK [3][-]{subsubsection.2.1.2}{Break ties}{subsection.2.1}% 9
+\BOOKMARK [3][-]{subsubsection.2.1.3}{K = 1 to 15}{subsection.2.1}% 10
+\BOOKMARK [2][-]{subsection.2.2}{Conditional Gaussian}{section.2}% 11
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Plot of log}{subsection.2.2}% 12
+\BOOKMARK [3][-]{subsubsection.2.2.2}{average log likelihood}{subsection.2.2}% 13
+\BOOKMARK [3][-]{subsubsection.2.2.3}{Accuracy}{subsection.2.2}% 14
+\BOOKMARK [2][-]{subsection.2.3}{Naives Bayes}{section.2}% 15
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Plot of }{subsection.2.3}% 16
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Plot of new samples}{subsection.2.3}% 17
+\BOOKMARK [3][-]{subsubsection.2.3.3}{average log likelihood}{subsection.2.3}% 18
+\BOOKMARK [3][-]{subsubsection.2.3.4}{accuracy}{subsection.2.3}% 19

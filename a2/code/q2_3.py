@@ -160,8 +160,8 @@ def avg_conditional_likelihood(bin_digits, labels, eta):
     
     avg_p_y  = p_y / n
         
-    #print "-------------in avg cond likelihood--------"
-    #print avg_p_y
+    print "-------------in avg cond likelihood--------"
+    print avg_p_y
     return avg_p_y
 
 def classify_data(bin_digits, eta):
@@ -179,6 +179,14 @@ def classify_data(bin_digits, eta):
     
     return new_points
 
+def classify_accuracy(predict_label, real_label):
+    n = real_label.shape[0]
+    accurate_class = 0
+    for i in range(0,n):
+        if predict_label[i] == real_label[i]:
+            accurate_class += 1
+    print "-------classify accuracy", (1.0 * accurate_class / n)
+
 def main():
     train_data, train_labels, test_data, test_labels = data.load_all_data('data')
     train_data, test_data = binarize_data(train_data), binarize_data(test_data)
@@ -188,27 +196,27 @@ def main():
 
     #Q2=------new images------
     # Evaluation
+    print "===========Q2.3========="
     print "eta image"
     plot_images(eta)
-    print "eta0", eta[0]
 
     print "new sample image"
     generate_new_data(eta)
     
-    #-------END Q2
     
-    #---------Q3
-    c_predict =  classify_data(test_data, eta)
-    #p = conditional_likelihood(train_data[0:2, 0:64], eta)
-    #print p
-    accurate_class = 0
-    for i in range(test_labels.shape[0]):
-        if c_predict[i] == test_labels[i]:
-            accurate_class += 1
+    print "---------Q 2.3.2---------"
+    train_predict =  classify_data(train_data, eta)
+    test_predict = classify_data(test_data, eta)
     
-    print "-------classify accuracy", (1.0 * accurate_class / len(test_labels))
+    print "---------avg likelihood----------"
+    avg_train = avg_conditional_likelihood(train_data, train_labels, eta)
+    avg_test = avg_conditional_likelihood(test_data, test_labels, eta)
     
-    #p1 = avg_conditional_likelihood(test_data, test_labels, eta)
-    #   p2 = avg_conditional_likelihood(train_data, train_labels, eta)
+    print "---------Q 2.3.6 Predication accuracy----"
+    train_acc = classify_accuracy(train_predict, train_labels)
+    print "train accuracy", train_acc
+    test_acc = classify_accuracy(test_predict, test_labels)
+    print "test accuracy", test_acc
+
 if __name__ == '__main__':
     main()

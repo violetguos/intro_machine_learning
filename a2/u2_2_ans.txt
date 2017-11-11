@@ -88,3 +88,17 @@ Created on Sun Nov  5 13:54:26 2017
 -------classify accuracy 0.443
 -------------in avg cond likelihood--------
 -5.9347773875
+ 
+==========================NOV 10========================
+============Q2.2 part2 average log likelihood========
+===========Train data average log likelihood=========
+-------------in avg cond likelihood--------
+40.0734191088
+===========Test data average log likelihood ========
+-------------in avg cond likelihood--------
+35.1502166328
+=============Q2.2 part3 prediction and accuracy of each predication======
+=============Train data prediction and accuracy========
+-------classify accuracy 0.981285714286
+=============Test data prediction and accuracy=========
+-------classify accuracy 0.95925

@@ -41,17 +41,12 @@
 
 \begin{equation*}
 \begin{split}
-P( \bm{x} | \ mu ,  \sigma) &= \sum_{k = 1}^{K}  P( \bm{x} | y = k, \ mu ,  \sigma) P(y = k | \mu, \sigma) \\
-&=  \sum_{k = 1}^{K} \alpha_{k} P( \bm{x} | y = k, \ mu ,  \sigma) \\
+P( \bm{x} | \mu ,  \sigma) &= \sum_{k = 1}^{K}  P( \bm{x} | y = k, \ mu ,  \sigma) P(y = k | \mu, \sigma) \\
+&=  \sum_{k = 1}^{K} \alpha_{k} P( \bm{x} | y = k, \mu ,  \sigma) \\
 &= \sum_{k = 1}^{K} \alpha_{k} (\prod_{i=1}^{D} 2\pi \sigma_{i})^{\frac{1}{2}} exp\{{- \sum_{i=1}^{D}} \frac{1}{2 \sigma_{i} ^2} (x_{i} - \mu_{ki})^2 \} 
 \end{split}
 \end{equation*}
  
-
-
-
-\subsection{visualization}
-
 \begin{equation*}
 \begin{split}
 P(y | \bm{x} , \ mu ,  \sigma) &= \frac{P( \bm{x}, y = k | \mu ,  \sigma)}{P( \bm{x} |  \mu ,  \sigma)}
@@ -69,17 +64,20 @@ P(y | \bm{x} , \ mu ,  \sigma) &= \frac{P( \bm{x}, y = k | \mu ,  \sigma)}{P( \b
 \begin{split}
 -log P(y^{(1)}, x^{(1)}, ..., y^{(N)}, x^{(N)} | \theta) 
 &=-log P(y^{(1)}, x^{(1)} | \theta) -log P(y^{(2)}, x^{(2)} | \theta) ... - log( y^{(N)}, x^{(N)} | \theta)\\
-&= \sum_{k = 1}^{K} -log [\alpha_{k} (\prod_{i = 1}{D} 2 \pi \sigma_{i} ^2)^{ -\frac{1}{2}}
-	 exp\{ - \sum_{i = 1}^{D} \frac{1}{2 \sigma_{i} ^2} (x_{i} - \mu_{ki})^2  \}] \\
-&= \sum_{k = 1}^{K} \sum_{i = 1}^{D} \frac{1}{2 \sigma_{i} ^2}(x_{i} - \mu_{ki})^2 
-	+ \sum_{k = 1}^{K} -log [\alpha_{k} (\prod_{i = 1}^{D} 2 \pi \sigma_{i} ^2)^{ -\frac{1}{2}}\\
-&=  \sum_{k = 1}^{K} \sum_{i = 1}^{D} \frac{1}{2 \sigma_{i} ^2}(x_{i} - \mu_{ki})^2 
-	+ \sum_{k = 1}^{K} \frac{1}{2} log [\alpha_{k} (\prod_{i = 1}^{D} 2 \pi \sigma_{i} ^2)\\
-&= \sum_{k = 1}^{K} \sum_{i = 1}^{D} \frac{1}{2 \sigma_{i} ^2}(x_{i} - \mu_{ki})^2  +
-	\sum_{k =1}^{K}  \sum_{i = 1}^{D}   [ \frac{1}{2} \alpha_{k} \log(2 \pi \sigma_{i} ^2) ]\\
+&= \sum_{j=1}^{N} -log P(y^{(j)}, x^{(j)} | \theta)\\
+&\text{N.B.: in this case, j is the index of the whole data set,} \\
+&\text{where as y(j) corresponds to the class that this sample}\\
+&\text{ belongs to, and y(j) = k , k in (0, 9)}\\
+&= \sum_{j = 1}^{N} -log [\alpha^{y(j)} (\prod_{i = 1}^{D} 2 \pi (\sigma_{i} ^{y(j)}) ^2)^{ -\frac{1}{2}}
+	 exp\{ - \sum_{i = 1}^{D} \frac{1}{(2 \sigma_{i}^{y(j)}) ^2} (x_{i}^{(j)} - \mu_{i}^{y(j)})^2  \}] \\
+&= \sum_{j=1}^{N} \sum_{i = 1}^{D} \frac{1}{2 \sigma_{i} ^2}(x_{i}^{(j)} - \mu_{i}^{y(j)})^2 
+	+ \sum_{j = 1}^{N} -log [\alpha^{y(j)} (\prod_{i = 1}^{D} 2 \pi (\sigma_{i}^{y(j)}) ^2)^{ -\frac{1}{2}}]\\
+&=  \sum_{j = 1}^{N} \sum_{i = 1}^{D} \frac{1}{2(\sigma_{i}^{y(j)})^2}(x_{i}^{(j)} - \mu_{i}^{y(j)})^2 
+	+ \sum_{j = 1}^{N} \frac{1}{2} log [\alpha^{y(j)} (\prod_{i = 1}^{D} 2 \pi (\sigma_{i}^{y(j)}) ^2]\\
+&= \sum_{j = 1}^{N} \sum_{i = 1}^{D} \frac{1}{2 \sigma_{i} ^2}(x_{i}^{(j)} - \mu_{i}^{y(j)})^2  + 
+	\sum_{j=1}^{N} \frac{1}{2} log( \alpha^{y(j)}) + \sum_{j = 1}^{N} \sum_{i = 1}^{D} log(2 \pi (\sigma_{i}^{y(j)})^2)  \\
 \end{split}
 \end{equation*}
-
 \subsection{visualization}
 
 \begin{equation*}
@@ -97,7 +95,8 @@ P(y | \bm{x} , \ mu ,  \sigma) &= \frac{P( \bm{x}, y = k | \mu ,  \sigma)}{P( \b
 \begin{split}
 \sum_{i = 1}^{D} \frac{1}{\sigma_{i} ^2}
 		(- x_{i} + \mu_{ki})  \mathbb{1} ( i = k) &= 0 \\
- x_{i} &= \frac{\sum_{i = 1}^{D}\mu_{ki}{\mathbb{1} ( i = k)}}{\sum_{i = 1}^{D} {\mathbb{1} ( i = k)}}
+\sum_{i = 1}^{D} \frac{1}{\sigma_{i} ^2}  x_{i}  \mathbb{1} ( i = k) &= 	\sum_{i = 1}^{D} \frac{1}{\sigma_{i} ^2} \mu_{ki}  \mathbb{1} ( i = k) \\
+\mu_{ki} &= \frac{\sum_{i = 1}^{D} x_{i}{\mathbb{1} ( i = k)}}{\sum_{i = 1}^{D} {\mathbb{1} ( i = k)}}\\
 \end{split}
 \end{equation*}
 
@@ -105,8 +104,8 @@ P(y | \bm{x} , \ mu ,  \sigma) &= \frac{P( \bm{x}, y = k | \mu ,  \sigma)}{P( \b
 \subsection{visualization}
 \begin{equation*}
 \begin{split}
-\pdv{}{\sigma_{i} ^2} &= \sum_{k = 1}^{K} \sum_{i = 1}^{D} - \frac{1}{2}(x_{i} - \mu_{ki})^2 \frac{1}{\sigma_{i} ^4} + \frac{1}{2}\sum_{k = 1}^{K} \sum_{i = 1}^{D} \frac{2 \pi}{2\pi \sigma_{i} ^2}\\
-&=  \sum_{k = 1}^{K} \sum_{i = 1}^{D} - \frac{1}{2}(x_{i} - \mu_{ki})^2 \frac{1}{\sigma_{i} ^4} + \frac{1}{2}\sum_{k = 1}^{K} \sum_{i = 1}^{D} \frac{1}{ \sigma_{i} ^2}\\
+\pdv{}{\sigma_{i} ^2} &= \sum_{k = 1}^{N} \sum_{i = 1}^{D} - \frac{1}{2}(x_{i} - \mu_{ki})^2 \frac{1}{\sigma_{i} ^4} + \frac{1}{2}\sum_{k = 1}^{N} \sum_{i = 1}^{D} \frac{2 \pi}{2\pi \sigma_{i} ^2}\\
+&=  \sum_{k = 1}^{N} \sum_{i = 1}^{D} - \frac{1}{2}(x_{i} - \mu_{ki})^2 \frac{1}{\sigma_{i} ^4} + \frac{1}{2}\sum_{k = 1}^{N} \sum_{i = 1}^{D} \frac{1}{ \sigma_{i} ^2}\\
 &=  \sum_{i = 1}^{D} \frac{1}{2} [ -(x_{i} - \mu_{ki})^2 \frac{1}{\sigma_{i} ^4} + \frac{1}{\sigma_{i} ^2}]{\mathbb{1} ( i = k)}\\
 \end{split}
 \end{equation*}
@@ -133,7 +132,7 @@ Setting $\pdv{}{\sigma_{i} ^2}$ to zero, we have\\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.5\textwidth]{q2_0_nums.png}
-\caption{\label{}}
+\caption{\label{}Plot of means in each digit class}
 \end{figure}
 
 
@@ -149,29 +148,6 @@ Setting $\pdv{}{\sigma_{i} ^2}$ to zero, we have\\
 In my program, I have the array label\char`_count[0 , 10] in function def query\_knn(self, test\_point, k): that stores the number of neighbours with the digit label corresponding to the index of label\_count array. I find the maximum number in label\_count, and the index of the max is the majority vote. If there are multiple, the function label\_count.argmax() will pick the index that comes first. This is justified in class, we can break ties randomly or assign to the first maximum vote.
 
 \subsubsection{K = 1 to 15}
-
-\begin{center}
-\begin{tabular}{ |c|c|c| } 
- \hline
- K & Training Accuracy & Test Accuracy  \\
- 1  &  1.0  &  0.96875 \\
-2  &  0.982571428571  &  0.96175 \\
-3  &  0.983428571429  &  0.96975  \\
-4  &  0.978  &  0.9665 \\
-5  &  0.977571428571  &  0.96775 \\
-6  &  0.974285714286  &  0.9645  \\
-7  &  0.973714285714  &  0.96325 \\
-8  &  0.970571428571  &  0.9615  \\
-9  &  0.969285714286  &  0.9605  \\
-10  &  0.967571428571  &  0.961 \\
-11  &  0.965428571429  &  0.9595 \\
-12  &  0.963142857143  &  0.95825 \\
-13  &  0.962428571429  &  0.95775 \\
-14  &  0.960142857143  &  0.95775 \\
-15  &  0.959428571429  &  0.9585  \\
- \hline
-\end{tabular}
-\end{center}
 
 
 
@@ -199,14 +175,48 @@ K & Average Fold \\
 \end{center}
 
 
+
+%\begin{center}
+%\begin{tabular}{ |c|c|c| } 
+ %\hline
+ %K & Training Accuracy & Test Accuracy  \\
+ %1  &  1.0  &  0.96875 \\
+%2  &  0.982571428571  &  0.96175 \\
+%3  &  0.983428571429  &  0.96975  \\
+%4  &  0.978  &  0.9665 \\
+%5  &  0.977571428571  &  0.96775 \\
+%6  &  0.974285714286  &  0.9645  \\
+%7  &  0.973714285714  &  0.96325 \\
+%8  &  0.970571428571  &  0.9615  \\
+%9  &  0.969285714286  &  0.9605  \\
+%10  &  0.967571428571  &  0.961 \\
+%11  &  0.965428571429  &  0.9595 \\
+%12  &  0.963142857143  &  0.95825 \\
+%13  &  0.962428571429  &  0.95775 \\
+%14  &  0.960142857143  &  0.95775 \\
+%15  &  0.959428571429  &  0.9585  \\
+% \hline
+%\end{tabular}
+%\end{center}
+
+
+
 %%%%%%%%%%%%%Q 2.2 %%%%%%%%%%%%%%%%%%%
 \subsection{Conditional Gaussian}
 \subsubsection{Plot of log}
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.5\textwidth]{log_sigma_k.png}
-\caption{\label{}}
+\caption{\label{}log of the diagonal elements of each covariance matrix}
 \end{figure}
+
+\subsubsection{average log likelihood}
+Train: 40.0734191088 \\
+Test: 35.1502166328\\
+
+\subsubsection{Accuracy}
+Train 0.981285714286\\
+Test 0.95925\\
 
 
 
@@ -215,16 +225,25 @@ K & Average Fold \\
 \subsubsection{Plot of $\eta$}
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\textwidth]{q3_eta.png}
-\caption{\label{}}
+\includegraphics[width=0.5\textwidth]{eta_plot.png}
+\caption{\label{}Plot of eta}
 \end{figure}
 
 
+\subsubsection{Plot of new samples}
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.5\textwidth]{eta_plot.png}
-\caption{\label{}}
+\includegraphics[width=0.5\textwidth]{q3_gen_new.png}
+\caption{\label{}Plot of new samples}
 \end{figure}
+
+\subsubsection{average log likelihood}
+training average log likelihood -30.7898021047\\
+testing average log likelihood -30.7369008592
+\subsubsection{accuracy}
+training accuracy 0.774142857143\\
+testing accuracy 0.76425\\
+
 
 
 % \section{Some examples to get started}

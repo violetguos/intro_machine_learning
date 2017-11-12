@@ -182,28 +182,28 @@ K & Average Fold \\
 
 
 
-%\begin{center}
-%\begin{tabular}{ |c|c|c| } 
- %\hline
- %K & Training Accuracy & Test Accuracy  \\
- %1  &  1.0  &  0.96875 \\
-%2  &  0.982571428571  &  0.96175 \\
-%3  &  0.983428571429  &  0.96975  \\
-%4  &  0.978  &  0.9665 \\
-%5  &  0.977571428571  &  0.96775 \\
-%6  &  0.974285714286  &  0.9645  \\
-%7  &  0.973714285714  &  0.96325 \\
-%8  &  0.970571428571  &  0.9615  \\
-%9  &  0.969285714286  &  0.9605  \\
-%10  &  0.967571428571  &  0.961 \\
-%11  &  0.965428571429  &  0.9595 \\
-%12  &  0.963142857143  &  0.95825 \\
-%13  &  0.962428571429  &  0.95775 \\
-%14  &  0.960142857143  &  0.95775 \\
-%15  &  0.959428571429  &  0.9585  \\
-% \hline
-%\end{tabular}
-%\end{center}
+\begin{center}
+\begin{tabular}{ |c|c|c| } 
+\hline
+K & Training Accuracy & Test Accuracy  \\
+1  &  1.0  &  0.96875 \\
+2  &  0.982571428571  &  0.96175 \\
+3  &  0.983428571429  &  0.96975  \\
+4  &  0.978  &  0.9665 \\
+5  &  0.977571428571  &  0.96775 \\
+6  &  0.974285714286  &  0.9645  \\
+7  &  0.973714285714  &  0.96325 \\
+8  &  0.970571428571  &  0.9615  \\
+9  &  0.969285714286  &  0.9605  \\
+10  &  0.967571428571  &  0.961 \\
+11  &  0.965428571429  &  0.9595 \\
+12  &  0.963142857143  &  0.95825 \\
+13  &  0.962428571429  &  0.95775 \\
+14  &  0.960142857143  &  0.95775 \\
+15  &  0.959428571429  &  0.9585  \\
+ \hline
+\end{tabular}
+\end{center}
 
 
 
@@ -250,6 +250,11 @@ testing average log likelihood -30.7369008592
 training accuracy 0.774142857143\\
 testing accuracy 0.76425\\
 
+%%%%%%%%%%%%%%Q2.4 %%%%%%%%%%%%
+\subsection{summary}
+The test accuracy of KNN is 96.875\%, test accuracy of conditional Gaussian is 95.925\%, and Naive Bayes is around 76.425\%. The highest performance is KNN, next followed closely by conditional gaussian, and Naive Bayes is the lowest.\\
+This matches my expectation because KNN is inferring class label based on neighbours, and conditional Gaussian is using shared covariance matrix. Our data set, handwritten digits, have very similar form in one class. In both KNN and conditional Gaussian, we are assuming that images in each class are similar, and we predict based on what we have seen already in a class.\\
+In Naive Bayes, however, we assume that all data are independent from each other. This assumption unfortunately does not hold in this dataset, and therefore reducing accuracy of our predictions.
 
 
 % \section{Some examples to get started}

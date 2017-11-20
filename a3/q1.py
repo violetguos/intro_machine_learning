@@ -10,6 +10,9 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.naive_bayes import BernoulliNB
 
+#TODO: KNN, SVM, 
+
+
 def load_data():
     # import and filter data
     newsgroups_train = fetch_20newsgroups(subset='train',remove=('headers', 'footers', 'quotes'))

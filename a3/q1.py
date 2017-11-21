@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.naive_bayes import BernoulliNB
+import sklearn.neighbors
 
 #TODO: KNN, SVM, 
 
@@ -60,17 +61,17 @@ def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     '''
     predicting using KNN
     '''
-    n_neighbors = 7
-    weights = 'uniform'
-    weights = 'distance'
-    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors, weights=weights)
+    n_neighbors = 11
+    #weights = 'uniform'
+    #weights = 'distance'
+    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors)#, weights=weights)
     clf.fit(X_train, y_train)
     y_predicted = clf.predict(X_test)
     if not confusion:
-        print colored('Classification report:', 'magenta', attrs=['bold'])
+        print ('Classification report:', 'magenta') #attrs=['bold'])
         print sklearn.metrics.classification_report(y_test, y_predicted, target_names=y_names)
     else:
-        print colored('Confusion Matrix:', 'magenta', attrs=['bold'])
+        print ('Confusion Matrix:', 'magenta')# attrs=['bold'])
         print sklearn.metrics.confusion_matrix(y_test, y_predicted)
 
     
@@ -78,4 +79,5 @@ if __name__ == '__main__':
     train_data, test_data = load_data()
     train_bow, test_bow, feature_names = bow_features(train_data, test_data)
 
-    bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
+    #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
+    knn_news(train_bow, train_data.target, test_bow, test_data.target)

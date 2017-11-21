@@ -57,7 +57,8 @@ class GDOptimizer(object):
     def update_params(self, params, grad):
         # Update parameters using GD with momentum and return
         # the updated parameters
-        return None
+        params  += self.lr * grad
+        return params
 
 class SVM(object):
     '''
@@ -75,7 +76,15 @@ class SVM(object):
         Returns a length-n vector containing the hinge-loss per data point.
         '''
         # Implement hinge loss
-        return None
+        wt = np.transpose(self.w)
+        wtx = np.dot(wt, X)
+        wtx_plus_c = np.add(wtx, self.c)
+        
+        n = X.shape[0]
+        l_hinge = np.zeros(n)
+        for i in range(n):
+            l_hinge[i] = max((1 - wtx_pluc_c[i]), 0)
+        return l_hinge
 
     def grad(self, X, y):
         '''
@@ -85,6 +94,7 @@ class SVM(object):
         Returns the gradient with respect to the SVM parameters (shape (m,)).
         '''
         # Compute (sub-)gradient of SVM objective
+        
         return None
 
     def classify(self, X):
@@ -134,10 +144,12 @@ def optimize_test_function(optimizer, w_init=10.0, steps=200):
 
     w = w_init
     w_history = [w_init]
-
-    for _ in range(steps):
+    
+    for i in range(steps):
         # Optimize and update the history
-        pass
+        grad = func_grad(w)
+        w -= optimizer.update_params(w, grad)
+        w_history.append(w)
     return w_history
 
 def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters):
@@ -147,4 +159,5 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
     return None
 
 if __name__ == '__main__':
-    pass
+    gd = GDOptimizer(1,0)
+    print optimize_test_function(gd)

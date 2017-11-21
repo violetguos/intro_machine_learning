@@ -56,6 +56,24 @@ def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
 
     return model
 
+def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+    '''
+    predicting using KNN
+    '''
+    n_neighbors = 7
+    weights = 'uniform'
+    weights = 'distance'
+    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors, weights=weights)
+    clf.fit(X_train, y_train)
+    y_predicted = clf.predict(X_test)
+    if not confusion:
+        print colored('Classification report:', 'magenta', attrs=['bold'])
+        print sklearn.metrics.classification_report(y_test, y_predicted, target_names=y_names)
+    else:
+        print colored('Confusion Matrix:', 'magenta', attrs=['bold'])
+        print sklearn.metrics.confusion_matrix(y_test, y_predicted)
+
+    
 if __name__ == '__main__':
     train_data, test_data = load_data()
     train_bow, test_bow, feature_names = bow_features(train_data, test_data)

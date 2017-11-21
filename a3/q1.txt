@@ -1,0 +1,6 @@
+No handlers could be found for logger "sklearn.datasets.twenty_newsgroups"
+11314 train data points.
+101631 feature dimension.
+Most common word in training set is "the"
+BernoulliNB baseline train accuracy = 0.598727240587
+BernoulliNB baseline test accuracy = 0.457912904939

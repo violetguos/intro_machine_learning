@@ -78,8 +78,13 @@ def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
 def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     clf = RandomForestClassifier(n_estimators=100)
     clf.fit(X_train, y_train)
-    pred = clf.predict(X_test)
-    print('svm baseline test accuracy = {}'.format((pred == y_test).mean()))
+    
+    #evaluate accuracy
+    train_pred = clf.predict(X_train)
+    print('svm baseline train accuracy = {}'.format((train_pred == y_train).mean()))
+    
+    test_pred = clf.predict(X_test)
+    print('svm baseline test accuracy = {}'.format((test_pred == y_test).mean()))
     
     
 if __name__ == '__main__':

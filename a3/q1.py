@@ -10,7 +10,7 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.naive_bayes import BernoulliNB
 import sklearn.neighbors
-
+from sklearn.ensemble import RandomForestClassifier
 #TODO: KNN, SVM, 
 
 
@@ -62,22 +62,31 @@ def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     predicting using KNN
     '''
     n_neighbors = 11
-    #weights = 'uniform'
-    #weights = 'distance'
+    weights = 'uniform'
+    weights = 'distance'
     clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors)#, weights=weights)
     clf.fit(X_train, y_train)
     y_predicted = clf.predict(X_test)
     if not confusion:
         print ('Classification report:', 'magenta') #attrs=['bold'])
-        print sklearn.metrics.classification_report(y_test, y_predicted, target_names=y_names)
+        print sklearn.metrics.classification_report(y_test, y_predicted)#, target_names=y_names)
     else:
         print ('Confusion Matrix:', 'magenta')# attrs=['bold'])
         print sklearn.metrics.confusion_matrix(y_test, y_predicted)
 
+
+def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+    clf = RandomForestClassifier(n_estimators=100)
+    clf.fit(X_train, y_train)
+    pred = clf.predict(X_test)
+    print('svm baseline test accuracy = {}'.format((pred == y_test).mean()))
+    
     
 if __name__ == '__main__':
     train_data, test_data = load_data()
     train_bow, test_bow, feature_names = bow_features(train_data, test_data)
 
     #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
-    knn_news(train_bow, train_data.target, test_bow, test_data.target)
+    train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
+    #knn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
+    svm_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)

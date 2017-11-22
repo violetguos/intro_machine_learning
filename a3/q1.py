@@ -11,6 +11,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.naive_bayes import BernoulliNB
 import sklearn.neighbors
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report,confusion_matrix
 #TODO: KNN, SVM, 
 
 
@@ -75,16 +77,23 @@ def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
         print sklearn.metrics.confusion_matrix(y_test, y_predicted)
 
 
-def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+def rand_forest_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     clf = RandomForestClassifier(n_estimators=100)
     clf.fit(X_train, y_train)
     
     #evaluate accuracy
     train_pred = clf.predict(X_train)
-    print('svm baseline train accuracy = {}'.format((train_pred == y_train).mean()))
+    print('rand forest baseline train accuracy = {}'.format((train_pred == y_train).mean()))
     
     test_pred = clf.predict(X_test)
-    print('svm baseline test accuracy = {}'.format((test_pred == y_test).mean()))
+    print('rand forest baseline test accuracy = {}'.format((test_pred == y_test).mean()))
+    
+def nn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+    mlp = MLPClassifier(hidden_layer_sizes=(30,30,30))
+    mlp.fit(X_train,y_train)
+    predictions = mlp.predict(X_test)
+    print(classification_report(y_test,predictions))
+    print(confusion_matrix(y_test,predictions))
     
     
 if __name__ == '__main__':
@@ -94,4 +103,5 @@ if __name__ == '__main__':
     #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
     train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
     #knn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
-    svm_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
+    #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
+    nn_news(train_tf, train_data.target, test_tf,test_data.target)

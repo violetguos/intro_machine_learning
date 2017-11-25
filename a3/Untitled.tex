@@ -25,7 +25,7 @@
 \usepackage{bm}
 \date{\today}
 
-\title{CSC411 Assignment 2}
+\title{CSC411 Assignment 3}
 \author{Yue Guo}
 \begin{document}
 \maketitle
@@ -51,11 +51,16 @@ x^T K x &= x^T (U \Lambda U^T) x = (x^T U) \Lambda (U^T x)\\
 %%%%%%%%%Q 3.2 %%%%%%%%%%%%%%
 \subsection{Kernel properties}
 %%%%%%%% Q 3.2 q2%%%%%%%%%%%%%
- \subsubsection{$\alpha$}
- K_{ij} = \alpha, the matrix K has dimension of x or y, and each element is \alpha. Since \alpha > 0, and all elements are eqaul, K is positive semidefinite
+\subsubsection{$\alpha$}
+ $K_{ij} = \alpha $, the matrix K has dimension of x or y, and each element is $\alpha$. Since $\alpha$ > 0, and all elements are eqaul, K is positive semidefinite
  
- \subsubseciton{f(x), f(y)}
- 
+ %%%%%%%Q 3.2 q3 %%%%%%%%%%%%%%
+\subsubsection{$f(x), f(y)$}
+$K_{ij} = <\phi (x),  \phi (y) >$, \\
+define $\phi(x) = f(x), \forall f: \mathbb{R}^{d} \rightarrow \mathbb{R}$\\
+define $\phi(y) = f(y), \forall f: \mathbb{R}^{d} \rightarrow \mathbb{R}$\\
+Since f(x) and f(y) produce a scalar,  $<\phi (x),  \phi (y) > = f(x) \cdot f(y)$
 
+\subsubsection{k1 and k2}
 
 \end{document}

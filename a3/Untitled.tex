@@ -1,0 +1,61 @@
+\documentclass[letterpaper, 12]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[letterpaper,top=2.5cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{physics}
+\usepackage{bbold}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{listings}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{enumitem}
+
+\usepackage{bm}
+\date{\today}
+
+\title{CSC411 Assignment 2}
+\author{Yue Guo}
+\begin{document}
+\maketitle
+
+%\centering
+%  \includegraphics[width=0.5\textwidth]{1.3.2/1_3_2_k50.png}
+%  \caption{k-NN Regression of $x \in [0, 11]$ with $k$ = 50.}
+%\end{figure}
+
+
+%%%%%%%%%%%Q3%%%%%%%%%%%%%%
+\section{Kernels}
+%%%%%%%%%% q 3.1%%%%%%%%%%%%%%
+\subsection{Positive semidefinite and quadratic form}
+Assume K is symmetric, we can decompose K into $U \Lambda U^T$
+\begin{equation*}
+\begin{split}
+x^T K x &= x^T (U \Lambda U^T) x = (x^T U) \Lambda (U^T x)\\
+&= \Sigma_{i =1}^{d} \lambda_{i} ([x^T U_{i}])^2 >= 0\\
+\end{split}
+\end{equation*}
+
+%%%%%%%%%Q 3.2 %%%%%%%%%%%%%%
+\subsection{Kernel properties}
+%%%%%%%% Q 3.2 q2%%%%%%%%%%%%%
+ \subsubsection{$\alpha$}
+ K_{ij} = \alpha, the matrix K has dimension of x or y, and each element is \alpha. Since \alpha > 0, and all elements are eqaul, K is positive semidefinite
+ 
+ \subsubseciton{f(x), f(y)}
+ 
+
+
+\end{document}

@@ -57,7 +57,8 @@ class GDOptimizer(object):
     def update_params(self, params, grad):
         # Update parameters using GD with momentum and return
         # the updated parameters
-        params  += self.lr * grad
+        v_t = self.beta * params
+        params  += (self.lr * grad + v_t)
         return params
 
 class SVM(object):
@@ -160,4 +161,5 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
 
 if __name__ == '__main__':
     gd = GDOptimizer(1,0)
-    print optimize_test_function(gd)
+    opt =  optimize_test_function(gd)
+    plt.plot(opt)  

@@ -57,8 +57,9 @@ class GDOptimizer(object):
     def update_params(self, params, grad):
         # Update parameters using GD with momentum and return
         # the updated parameters
-        v_t = self.beta * params
-        params  += (self.lr * grad + v_t)
+        
+        v_t = (self.beta * params + grad)
+        params  += (self.lr * v_t)
         return params
 
 class SVM(object):
@@ -95,8 +96,18 @@ class SVM(object):
         Returns the gradient with respect to the SVM parameters (shape (m,)).
         '''
         # Compute (sub-)gradient of SVM objective
+        n, m = X.shape
+        w_update = []
+        w_sum = []
+        for i in range(n):
+            w_sum_ = np.sum(X[i])
+            w_sum.append(w_sum_)
+        for i in range(n):
+            dj_dw = self.w[i] -  w_sum[i]
+            
+            
         
-        return None
+        return dj_dw
 
     def classify(self, X):
         '''
@@ -105,7 +116,21 @@ class SVM(object):
         Returns the predicted class labels (shape (n,))
         '''
         # Classify points as +1 or -1
-        return None
+        n, m = X.shape
+        
+        xt = np.transpose(X)
+        xtw = np.dot(xt, self.w)
+        
+        y = self.c + xtw
+        
+        res = np.zeros(n)
+        for i in range(n): 
+            if y > 0:
+                res[i] = 1
+            else: 
+                res[i] = -1
+        
+        return res
 
 def load_data():
     '''
@@ -157,9 +182,33 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
     '''
     Optimize the SVM with the given hyperparameters. Return the trained SVM.
     '''
-    return None
+    #sample, each penalty
+    
+    for i in range(iters):
+        batch_sample = BatchSampler(train_data, train_targets, batchsize)
+        batch_train, batch_targets = batch_sample.get_batch()
+        svm = SVM(penalty[i], train_data.shape[0])
+        svm.grad(batch_train, batch_targets)
+        res = svm.classify(batch_train)
+    return res
 
 if __name__ == '__main__':
-    gd = GDOptimizer(1,0)
-    opt =  optimize_test_function(gd)
-    plt.plot(opt)  
+    """
+    gd1 = GDOptimizer(1,0)
+    opt_test_1 =  optimize_test_function(gd1)
+    gd2 = GDOptimizer(1, 0.9)
+    opt_test_2 = optimize_test_function(gd2)
+    
+    print "=====opt test beta = 0===="
+    x = np.linspace(0,4, 201)
+    plt.plot(x, opt_test_1)
+    plt.show()
+    print "======opt test beta = 0.9====="
+    plt.plot(x, opt_test_2)
+    plt.show()
+    """
+    train_data, train_targets, test_data, test_targets = load_data()
+    penalty = np.array((1,10))
+    res = optimize_svm(train_data, train_targets, penalty, GDOptimizer, 10, 2)
+    print res
+    

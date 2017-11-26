@@ -16,6 +16,7 @@ from sklearn.metrics import classification_report,confusion_matrix
 from sklearn.feature_selection import SelectFromModel
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import SelectKBest, chi2
 #TODO: KNN, SVM, 
 
 
@@ -62,7 +63,7 @@ def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
 
     return model
 
-def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     '''
     predicting using KNN
     '''
@@ -84,19 +85,24 @@ def knn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
         print sklearn.metrics.confusion_matrix(y_test, y_predicted)
 
 
-def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False, feature_sel=False):
     '''
     predicting using KNN
     '''
     n_neighbors = 11
     weights = 'uniform'
     weights = 'distance'
-    clf = Pipeline([
-  ('feature_selection', SelectFromModel(LinearSVC(penalty="l1"))),
-  ('classification', LinearSVC(kernel='linear')())
-])
-    #clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors)#, weights=weights)
-    clf.fit(X_train, y_train)
+
+    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors)#, weights=weights)
+
+    if feature_sel:
+        clf = clf.fit(X_train, y_train)
+        ch2 = SelectKBest(chi2, k=k_)
+        X_train = ch2.fit_transform(X_train, y_train)
+        X_test = ch2.transform(X_test)
+
+    
+    clf = clf.fit(X_train, y_train)
     y_predicted = clf.predict(X_test)
     if not confusion:
         print ('Classification report:', 'magenta') #attrs=['bold'])
@@ -137,4 +143,10 @@ if __name__ == '__main__':
     #knn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #nn_news(train_tf, train_data.target, test_tf,test_data.target)
-    svm_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
+    
+    #test KNN, with different k values
+    k_arr = [10, 100, 1000]
+    for k in k_arr:
+        print "======================="
+        print "k =%d KNN", k
+        knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)

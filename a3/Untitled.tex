@@ -61,6 +61,26 @@ define $\phi(x) = f(x), \forall f: \mathbb{R}^{d} \rightarrow \mathbb{R}$\\
 define $\phi(y) = f(y), \forall f: \mathbb{R}^{d} \rightarrow \mathbb{R}$\\
 Since f(x) and f(y) produce a scalar,  $<\phi (x),  \phi (y) > = f(x) \cdot f(y)$
 
+%%%%%%%%Q3.2 part 3%%%%%%%%%%%
 \subsubsection{k1 and k2}
+If the gram matrix, $K_{1}$ of kernel k1 and gram matrix, $K_{2}$ of kernel k2 are positive semidefinite, by scaling them and adding each element, the new gram matrix of $a \cdot k_{1}(x, y) + b \cdot k_{2}(x, y)$, call it $K$, each element of K is positive since a ,b > 0.\\
+$K$ is also symmetric because $K_{1}$ and $K_{2}$ are symmetric with the same dimension, and element wise addition and linear combination preserve the symmetric property.\\
+
+%%%%%%%%Q3.2 part 4%%%%%%%%%%%
+\subsubsection{$k(x, y) = \frac{k_{1}(x ,y) }{\sqrt{k_{1}(x, x)} \sqrt{k_{1}(y, y)} }$}
+Let $\phi_{1}$ be the mapping defined by $k_{1}$\\
+We define a new mapping, $\phi$ for $k(x ,y)$\\
+We let $\phi(x) = \frac{\phi_{1} (x)}{\norm{\phi_{1}(x)}}$\\
+\begin{equation*}
+\begin{split}
+k(x, y) &= <\phi (x), \phi (y)>\\
+&= \frac{\phi_{1}(x)}{\norm{\phi_{1}(x)}} \cdot  \frac{\phi_{1}(y)}{\norm{\phi_{1}(y)}}\\
+&= \frac{\phi_{1}(x)}{\sqrt{\phi_{1}(x) \cdot \phi_{1}(x)}} \cdot \frac{\phi_{1}(y)}{\sqrt{\phi_{1}(y) \cdot \phi_{1}(y)}}\\
+&= \frac{\phi_{1}(x)}{( \sqrt{\phi_{1}(x)} \cdot \sqrt{ \phi_{1}(y)}  )}  \cdot \frac{\phi_{1}(y)}{( \sqrt{\phi_{1}(x)} \cdot \sqrt{ \phi_{1}(y)}  )} \\
+&= \frac{\phi_{1}(x)}{ \sqrt{\phi_{1}(x) \cdot  \phi_{1}(y) }}  \cdot  \frac{\phi_{1}(x)}{ \sqrt{\phi_{1}(x) \cdot  \phi_{1}(y) }}\\
+ k(x, y) &= \frac{k_{1}(x ,y) }{\sqrt{k_{1}(x, x)} \sqrt{k_{1}(y, y)} }
+\end{split}
+\end{equation*}
+
 
 \end{document}

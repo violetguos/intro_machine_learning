@@ -209,6 +209,27 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
         w_history.append(np.sum(svm.w))
     return svm
 
+def sign_to_num(res):
+    '''
+    convert +/-1 into 4 vs 9
+    '''
+    for i in res:
+        if i ==1:
+            i = 4
+        else:
+            i = 9
+
+
+def accuracy_func(res, targets):
+    '''
+    simple accuracy calculation 
+    '''
+    accurate = 0
+    for i,j in zip(res, targets):
+        if  i==j:
+            accurate +=1
+    return 1.0 * (accurate)/len(targets)
+
 if __name__ == '__main__':
     """
     gd1 = GDOptimizer(1, 0)
@@ -229,7 +250,16 @@ if __name__ == '__main__':
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
     predict = res.classify(test_data)
 
+    sign_to_num(predict)
+
+
     loss = res.hinge_loss(test_data, test_targets)
+    print "======= hinge loss ======="
     print loss.sum()
+    
+    
+    print "=======  accuracy ======="
+    print accuracy_func(predict, test_targets)
+    
     
     

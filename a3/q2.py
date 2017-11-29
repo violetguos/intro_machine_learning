@@ -2,7 +2,7 @@ import numpy as np
 
 from sklearn.datasets import fetch_mldata
 import matplotlib.pyplot as plt
-
+import math
 np.random.seed(1847)
 
 class BatchSampler(object):
@@ -63,20 +63,12 @@ class GDOptimizer(object):
         # Update parameters using GD with momentum and return
         # the updated parameters
         #print "val", self.vel
-        if (self.beta == 0 or self.vel == 0):
-            v_t = 0
-        else:
-            v_t = self.beta * self.vel
-            print "vt", v_t
-        lr_vt = self.lr * v_t
-        #print "lr vt", lr_vt
-        #print "grad", grad
-        v_t_temp = np.add(lr_vt, grad)
-        #print "vt temp", v_t_temp
-        params  = params - v_t_temp
-        #print "params", params
-        self.vel = v_t_temp
-        #print self.vel
+   
+        v_t_plus = self.beta * self.vel
+        print "vt", v_t_plus
+        v_t_plus = v_t_plus + grad     
+        params  = params - (self.lr * v_t_plus)
+        self.vel = v_t_plus
         return params
 
 class SVM(object):
@@ -100,9 +92,9 @@ class SVM(object):
         #print y.shape (100)
         
         wt = np.transpose(self.w)
-        #print wt
-        wtx = np.dot( X, self.w)
-        wtx_plus_c = wtx + self.c #shape (100,)
+        #print self.w
+        wtx = np.dot(X, self.w)
+        wtx_plus_c = wtx #shape (100,)
         #print wtx_plus_c.shape
         n = X.shape[0]
         l_hinge = np.zeros(n)
@@ -126,15 +118,22 @@ class SVM(object):
         
         #TODO: is W a single constant, or vector???
         #hinge loss
-        x_times_y = np.dot(yt, X)
-        #print "x time y", x_times_y
-        loss_sum =np.sum(hinge_loss)
-        #print hinge_loss
-        #print loss_sum
-        x_times_y = x_times_y + loss_sum
-        #print "x time y", x_times_y
-        return x_times_y
-
+        
+        hinge_grad = 0
+        for i in range(len(hinge_loss)):
+            if hinge_loss[i] != 0:
+                yx = np.dot(y[i], X[i])
+                #print yx
+                yx = np.sum(yx)
+                hinge_grad += yx
+                print hinge_grad
+        
+        grad = self.w - hinge_grad
+        #print grad
+        
+        #grad = self.w - np.sum(hinge_loss)
+        return grad
+    
     def classify(self, X):
         '''
         Classify new input data matrix (shape (n,m)).
@@ -142,14 +141,13 @@ class SVM(object):
         Returns the predicted class labels (shape (n,))
         '''
         # Classify points as +1 or -1
-        n, m = X.shape
+        n, m = X.shape #(784, 2757)
         
         xt = np.transpose(X)
-        
+        #print xt
         xtw = np.dot(X, self.w)
-        print "xtw shape", xtw.shape
-        y = np.add(self.c , xtw)
-        print "y shape", y.shape
+        
+        y = xtw
         res = np.zeros(m)
         for i in range(m): 
             if y[i] > 0:
@@ -224,17 +222,14 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
     w_init = np.sum(svm.w)
     #print w_init
     w_history = [w_init]
+    batch_sampler = BatchSampler(train_data, train_targets, batchsize)
+    batch_train, batch_targets = batch_sampler.get_batch() 
+
+
     for i in range(iters):
-        batch_sample = BatchSampler(train_data, train_targets, batchsize)
-        batch_train, batch_targets = batch_sample.get_batch() 
         svm_grad = svm.grad(batch_train, batch_targets)
-        #hinge_loss = svm.hinge_loss(batch_train, batch_targets)
-        #h_loss =  penalty * np.sum(hinge_loss)/n
         svm.w = (optimizer.update_params(svm.w, svm_grad))# + hinge_loss #+ h_loss))
         w_history.append(np.sum(svm.w))
-    
-    
-    
     return svm
 
 
@@ -269,7 +264,7 @@ if __name__ == '__main__':
     """
     
     print "==========SVM ==========="
-    gd1 = GDOptimizer(0.05, 0)
+    gd1 = GDOptimizer(0.05, 0, 0)
     train_data, train_targets, test_data, test_targets = load_data()
     
     #Add one to bias
@@ -278,17 +273,10 @@ if __name__ == '__main__':
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
     predict = res.classify(test_data)
 
-    #sign_to_num(predict)
 
-
-    loss = res.hinge_loss(test_data, test_targets)
-    print "======= hinge loss ======="
-    #print loss.sum()
-    
-    
     print "=======  accuracy ======="
     print accuracy_func(predict, test_targets)
     
-    
+
     
     

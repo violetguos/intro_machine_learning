@@ -67,8 +67,8 @@ class GDOptimizer(object):
             v_t = 0
         else:
             v_t = self.beta * self.vel
-        v_t += grad
-        params  = params - (self.lr * v_t)
+        v_t = self.lr * v_t + grad
+        params  = params - v_t
         self.vel = v_t
         return params
 
@@ -110,12 +110,12 @@ class SVM(object):
        
         yt = np.transpose(y)
         
-        #hinge_loss = self.hinge_loss(X, y)
+        hinge_loss = self.hinge_loss(X, y)
         
         #TODO: is W a single constant, or vector???
         #hinge loss
         x_times_y = np.dot(yt, X)
-        x_times_y = x_times_y #np.sum(hinge_loss)
+        x_times_y = x_times_y + np.sum(hinge_loss)
 
         return x_times_y
 
@@ -211,9 +211,9 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
         batch_sample = BatchSampler(train_data, train_targets, batchsize)
         batch_train, batch_targets = batch_sample.get_batch() 
         svm_grad = svm.grad(batch_train, batch_targets)
-        hinge_loss = svm.hinge_loss(batch_train, batch_targets)
-        h_loss =  penalty * np.sum(hinge_loss)/n
-        svm.w = (optimizer.update_params(svm.w, svm_grad + h_loss))
+        #hinge_loss = svm.hinge_loss(batch_train, batch_targets)
+        #h_loss =  penalty * np.sum(hinge_loss)/n
+        svm.w = (optimizer.update_params(svm.w, svm_grad))# + hinge_loss #+ h_loss))
         w_history.append(np.sum(svm.w))
     
     
@@ -234,7 +234,7 @@ def accuracy_func(res, targets):
 
 if __name__ == '__main__':
     
-    
+    """
     gd1 = GDOptimizer(1, 0)
     opt_test_1 =  optimize_test_function(gd1)
     gd2 = GDOptimizer(1, 0.9)
@@ -254,6 +254,9 @@ if __name__ == '__main__':
     print "==========SVM ==========="
     gd1 = GDOptimizer(0.05, 0)
     train_data, train_targets, test_data, test_targets = load_data()
+    
+    #Add one to bias
+    
     penalty = 1
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
     predict = res.classify(test_data)
@@ -268,7 +271,7 @@ if __name__ == '__main__':
     
     print "=======  accuracy ======="
     print accuracy_func(predict, test_targets)
-    """
+    
     
     
     

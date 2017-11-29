@@ -172,7 +172,21 @@ def conditional_likelihood(digits, means, covariances):
     n = len(digits)
 
     log_pxy_gen =generative_likelihood(digits, means, covariances)
-    log_pyx_cond = log_pxy_gen + np.log(0.1)
+    
+    for i in range(0, n):
+             #print "=============in cond likelihood"
+             #print log_pxy_gen[i].shape
+             p_x_y_=  np.exp(log_pxy_gen[i])
+          		          
+             p_x_y_ = p_x_y_ * 0.1 #verfied dim 10
+   #print "=============in cond likelihood pxy shape"
+  #print p_x_y_.shape
+       #print "=============in cond likelihood"
+       #print "p_x_y", p_x_y_
+  
+    p_x_y_sum = np.sum(p_x_y_)
+
+    log_pyx_cond = log_pxy_gen + np.log(0.1)- np.log(p_x_y_sum)
      
    
     return log_pyx_cond

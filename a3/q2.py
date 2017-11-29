@@ -67,9 +67,16 @@ class GDOptimizer(object):
             v_t = 0
         else:
             v_t = self.beta * self.vel
-        v_t = self.lr * v_t + grad
-        params  = params - v_t
-        self.vel = v_t
+            print "vt", v_t
+        lr_vt = self.lr * v_t
+        #print "lr vt", lr_vt
+        #print "grad", grad
+        v_t_temp = np.add(lr_vt, grad)
+        #print "vt temp", v_t_temp
+        params  = params - v_t_temp
+        #print "params", params
+        self.vel = v_t_temp
+        #print self.vel
         return params
 
 class SVM(object):
@@ -88,14 +95,19 @@ class SVM(object):
         Returns a length-n vector containing the hinge-loss per data point.
         '''
         # Implement hinge loss
-        wt = np.transpose(self.w)
-        wtx = np.dot( X, self.w)
-        wtx_plus_c = np.add(wtx, self.c)
+        #print self.w.shape (784,)
+        #print X.shape (100, 784)
+        #print y.shape (100)
         
+        wt = np.transpose(self.w)
+        #print wt
+        wtx = np.dot( X, self.w)
+        wtx_plus_c = wtx + self.c #shape (100,)
+        #print wtx_plus_c.shape
         n = X.shape[0]
         l_hinge = np.zeros(n)
         for i in range(n):
-            l_hinge[i] = max(y[i]*(1 - wtx_plus_c[i]), 0)
+            l_hinge[i] = max(y[i]*(1- wtx_plus_c[i]), 0)
         return l_hinge
 
     def grad(self, X, y):
@@ -107,7 +119,7 @@ class SVM(object):
         '''
         # Compute (sub-)gradient of SVM objective
         n, m = X.shape
-       
+        
         yt = np.transpose(y)
         
         hinge_loss = self.hinge_loss(X, y)
@@ -115,8 +127,12 @@ class SVM(object):
         #TODO: is W a single constant, or vector???
         #hinge loss
         x_times_y = np.dot(yt, X)
-        x_times_y = x_times_y + np.sum(hinge_loss)
-
+        #print "x time y", x_times_y
+        loss_sum =np.sum(hinge_loss)
+        #print hinge_loss
+        #print loss_sum
+        x_times_y = x_times_y + loss_sum
+        #print "x time y", x_times_y
         return x_times_y
 
     def classify(self, X):
@@ -129,12 +145,13 @@ class SVM(object):
         n, m = X.shape
         
         xt = np.transpose(X)
+        
         xtw = np.dot(X, self.w)
-        
-        y = self.c + xtw
-        
-        res = np.zeros(n)
-        for i in range(n): 
+        print "xtw shape", xtw.shape
+        y = np.add(self.c , xtw)
+        print "y shape", y.shape
+        res = np.zeros(m)
+        for i in range(m): 
             if y[i] > 0:
                 res[i] = 1
             else: 
@@ -201,12 +218,12 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
     
     '''
     #sample, each penalty
+    n, m = train_data.shape
     
-    svm = SVM(penalty, train_data.shape[1])
+    svm = SVM(penalty, m)
     w_init = np.sum(svm.w)
     #print w_init
     w_history = [w_init]
-    n, m = train_data.shape
     for i in range(iters):
         batch_sample = BatchSampler(train_data, train_targets, batchsize)
         batch_train, batch_targets = batch_sample.get_batch() 

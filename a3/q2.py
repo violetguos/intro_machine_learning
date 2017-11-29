@@ -63,9 +63,9 @@ class GDOptimizer(object):
         # Update parameters using GD with momentum and return
         # the updated parameters
         
-        grad_sum = grad.sum()
-        v_t = (self.beta * params + grad_sum)
-        params  += (self.lr * v_t)
+        v_t = (self.beta * self.vel + grad)
+        params  = params - (self.lr * v_t)
+        self.vel = v_t
         return params
 
 class SVM(object):
@@ -178,7 +178,7 @@ def optimize_test_function(optimizer, w_init=10.0, steps=200):
     for i in range(steps):
         # Optimize and update the history 
         grad = func_grad(w)
-        w -= optimizer.update_params(w, grad)
+        w = optimizer.update_params(w, grad)
         w_history.append(w)
     return w_history
 
@@ -231,6 +231,7 @@ def accuracy_func(res, targets):
     return 1.0 * (accurate)/len(targets)
 
 if __name__ == '__main__':
+    
     """
     gd1 = GDOptimizer(1, 0)
     opt_test_1 =  optimize_test_function(gd1)
@@ -243,6 +244,7 @@ if __name__ == '__main__':
     print "======opt test beta = 0.9====="
     plt.plot(opt_test_2)
     plt.show()
+
     """
     gd1 = GDOptimizer(0.05, 0)
     train_data, train_targets, test_data, test_targets = load_data()
@@ -250,7 +252,7 @@ if __name__ == '__main__':
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
     predict = res.classify(test_data)
 
-    sign_to_num(predict)
+    #sign_to_num(predict)
 
 
     loss = res.hinge_loss(test_data, test_targets)
@@ -260,6 +262,7 @@ if __name__ == '__main__':
     
     print "=======  accuracy ======="
     print accuracy_func(predict, test_targets)
+
     
     
     

@@ -47,6 +47,23 @@ def tf_idf_features(train_data, test_data):
     tf_idf_test = tf_idf_vectorize.transform(test_data.data)
     return tf_idf_train, tf_idf_test, feature_names
 
+
+
+def confusion_mat(test_labels, train_labels ):
+    #number of unique labels
+    unique_labels = list(set(test_labels))
+    
+    k = len(unique_labels)
+    conf = np.zeros((k,k))
+    #count number of labels
+    for i in unique_labels:
+        for j in range(len(test_labels)):
+            if 
+            
+    return 
+
+
+
 def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
     # training the baseline model
     binary_train = (bow_train>0).astype(int)

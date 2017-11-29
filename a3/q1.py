@@ -142,6 +142,10 @@ def rand_forest_news(X_train, y_train, X_test, y_test, y_names=None, confusion=F
     
     test_pred = clf.predict(X_test)
     print('rand forest baseline test accuracy = {}'.format((test_pred == y_test).mean()))
+  
+
+def svm_news():
+    pass    
     
 def nn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     mlp = MLPClassifier(hidden_layer_sizes=(30,30,30))

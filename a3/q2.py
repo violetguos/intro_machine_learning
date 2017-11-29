@@ -53,17 +53,21 @@ class GDOptimizer(object):
         beta - momentum hyperparameter
     '''
 
-    def __init__(self, lr, beta=0.0):
+    def __init__(self, lr, beta=0.0, vel = 0.0):
         self.lr = lr
         self.beta = beta
-        self.vel = 0.0
+        self.vel = vel
 
 
     def update_params(self, params, grad):
         # Update parameters using GD with momentum and return
         # the updated parameters
-        
-        v_t = (self.beta * self.vel + grad)
+        #print "val", self.vel
+        if (self.beta == 0 or self.vel == 0):
+            v_t = 0
+        else:
+            v_t = self.beta * self.vel
+        v_t += grad
         params  = params - (self.lr * v_t)
         self.vel = v_t
         return params
@@ -106,10 +110,12 @@ class SVM(object):
        
         yt = np.transpose(y)
         
-        x_times_y = np.dot(yt, X)
+        #hinge_loss = self.hinge_loss(X, y)
         
         #TODO: is W a single constant, or vector???
-        #print "shape x tiems y", x_times_y.shape
+        #hinge loss
+        x_times_y = np.dot(yt, X)
+        x_times_y = x_times_y #np.sum(hinge_loss)
 
         return x_times_y
 
@@ -198,26 +204,22 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
     
     svm = SVM(penalty, train_data.shape[1])
     w_init = np.sum(svm.w)
-    print w_init
+    #print w_init
     w_history = [w_init]
-
+    n, m = train_data.shape
     for i in range(iters):
         batch_sample = BatchSampler(train_data, train_targets, batchsize)
         batch_train, batch_targets = batch_sample.get_batch() 
         svm_grad = svm.grad(batch_train, batch_targets)
-        svm.w -= optimizer.update_params(svm.w, svm_grad)
+        hinge_loss = svm.hinge_loss(batch_train, batch_targets)
+        h_loss =  penalty * np.sum(hinge_loss)/n
+        svm.w = (optimizer.update_params(svm.w, svm_grad + h_loss))
         w_history.append(np.sum(svm.w))
+    
+    
+    
     return svm
 
-def sign_to_num(res):
-    '''
-    convert +/-1 into 4 vs 9
-    '''
-    for i in res:
-        if i ==1:
-            i = 4
-        else:
-            i = 9
 
 
 def accuracy_func(res, targets):
@@ -232,20 +234,24 @@ def accuracy_func(res, targets):
 
 if __name__ == '__main__':
     
-    """
+    
     gd1 = GDOptimizer(1, 0)
     opt_test_1 =  optimize_test_function(gd1)
     gd2 = GDOptimizer(1, 0.9)
     opt_test_2 = optimize_test_function(gd2)
     
     print "=====opt test beta = 0===="
-    plt.plot(opt_test_1)
-    plt.show()
+    plt.plot(opt_test_1, label = 'beta = 0 ')
+    #plt.show()
     print "======opt test beta = 0.9====="
-    plt.plot(opt_test_2)
+    plt.plot(opt_test_2, label = 'beta = 0.9')
+    plt.title("SGD test")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
 
     """
+    
+    print "==========SVM ==========="
     gd1 = GDOptimizer(0.05, 0)
     train_data, train_targets, test_data, test_targets = load_data()
     penalty = 1
@@ -257,12 +263,12 @@ if __name__ == '__main__':
 
     loss = res.hinge_loss(test_data, test_targets)
     print "======= hinge loss ======="
-    print loss.sum()
+    #print loss.sum()
     
     
     print "=======  accuracy ======="
     print accuracy_func(predict, test_targets)
-
+    """
     
     
     

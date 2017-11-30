@@ -79,6 +79,7 @@ class SVM(object):
     def __init__(self, c, feature_count):
         self.c = c
         self.w = np.random.normal(0.0, 0.1, feature_count)
+        #self.feature_count = feature_count
         
     def hinge_loss(self, X, y):
         '''
@@ -120,18 +121,18 @@ class SVM(object):
         #hinge loss
         
         hinge_grad = 0
-        #for i in range(len(hinge_loss)):
-        yx = np.dot(y[i], X[i])
-        #print yx
-        #yx = np.sum(yx)
-        hinge_grad += yx
+        
+            
+        #yx = np.dot(y, X)
+  
+        #hinge_grad += yx
         #print hinge_grad
         
-        grad = self.w - yx
+        grad = self.w - np.sum(hinge_loss) * self.c/m# yx 
         #print grad
         
         #grad = self.w - np.sum(hinge_loss)
-        return grad
+        return ( grad)
     
     def classify(self, X):
         '''
@@ -147,9 +148,12 @@ class SVM(object):
         xtw = np.dot(X, self.w)
         
         y = xtw
+        print y
+        #print y[0]
         res = np.zeros(m)
         for i in range(m): 
-            if y[i] > 0:
+            
+            if y[i] > 1:
                 res[i] = 1
             else: 
                 res[i] = -1
@@ -231,17 +235,23 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
         w_history.append(np.sum(svm.w))
     return svm
 
-
+def plot_w(svm):
+    i_mean_matrix = np.reshape(svm.w, (28,28))
+    plt.imshow(i_mean_matrix, cmap='gray')
+    plt.show()
 
 def accuracy_func(res, targets):
     '''
     simple accuracy calculation 
     '''
+    n = targets.shape[0]
     accurate = 0
     for i,j in zip(res, targets):
+        #print i, j
         if  i == j:
+            #print i, j
             accurate +=1
-    return 1.0 * (accurate)/len(targets)
+    return 1.0 * (accurate)/n
 
 if __name__ == '__main__':
     
@@ -292,5 +302,5 @@ if __name__ == '__main__':
     predict2 = res2.classify(test_data)
     print accuracy_func(predict2, test_targets)
 
-
+    #plot_w(res)
     

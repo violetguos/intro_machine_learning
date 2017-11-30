@@ -132,7 +132,7 @@ class SVM(object):
         #print grad
         
         #grad = self.w - np.sum(hinge_loss)
-        return ( grad)
+        return (grad)
     
     def classify(self, X):
         '''
@@ -277,14 +277,14 @@ if __name__ == '__main__':
     train_data, train_targets, test_data, test_targets = load_data()
     
     #Add one to bias
-    #n_train, m_train = train_data.shape
-    #n_test, m_test = test_data.shape
+    n_train, m_train = train_data.shape
+    n_test, m_test = test_data.shape
     
-    #train_ones = np.ones((n_train, 1))
-    #np.append(train_data, train_ones, axis=1)
+    train_ones = np.ones((n_train, 1))
+    np.append(train_data, train_ones, axis=1)
     
-    #test_ones = np.ones((n_test, 1))
-    #np.append(test_data, test_ones, axis = 1)
+    test_ones = np.ones((n_test, 1))
+    np.append(test_data, test_ones, axis = 1)
     
     
     penalty = 1

@@ -65,7 +65,7 @@ class GDOptimizer(object):
         #print "val", self.vel
    
         v_t_plus = self.beta * self.vel
-        print "vt", v_t_plus
+        #print "vt", v_t_plus
         v_t_plus = v_t_plus + grad     
         params  = params - (self.lr * v_t_plus)
         self.vel = v_t_plus
@@ -120,15 +120,14 @@ class SVM(object):
         #hinge loss
         
         hinge_grad = 0
-        for i in range(len(hinge_loss)):
-            if hinge_loss[i] != 0:
-                yx = np.dot(y[i], X[i])
-                #print yx
-                yx = np.sum(yx)
-                hinge_grad += yx
-                print hinge_grad
+        #for i in range(len(hinge_loss)):
+        yx = np.dot(y[i], X[i])
+        #print yx
+        #yx = np.sum(yx)
+        hinge_grad += yx
+        #print hinge_grad
         
-        grad = self.w - hinge_grad
+        grad = self.w - yx
         #print grad
         
         #grad = self.w - np.sum(hinge_loss)
@@ -240,7 +239,7 @@ def accuracy_func(res, targets):
     '''
     accurate = 0
     for i,j in zip(res, targets):
-        if  i==j:
+        if  i == j:
             accurate +=1
     return 1.0 * (accurate)/len(targets)
 
@@ -268,15 +267,30 @@ if __name__ == '__main__':
     train_data, train_targets, test_data, test_targets = load_data()
     
     #Add one to bias
+    #n_train, m_train = train_data.shape
+    #n_test, m_test = test_data.shape
+    
+    #train_ones = np.ones((n_train, 1))
+    #np.append(train_data, train_ones, axis=1)
+    
+    #test_ones = np.ones((n_test, 1))
+    #np.append(test_data, test_ones, axis = 1)
+    
     
     penalty = 1
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
     predict = res.classify(test_data)
-
-
-    print "=======  accuracy ======="
+    
+    print "=======  accuracy , momentum = 0 ======="
     print accuracy_func(predict, test_targets)
     
-
     
+    print "======= accuracy, momentum = 0.1 ======="
+    gd2 = GDOptimizer(0.05, 0.1, 0)
+
+    res2 = optimize_svm(train_data, train_targets, penalty, gd2, 100, 500)
+    predict2 = res2.classify(test_data)
+    print accuracy_func(predict2, test_targets)
+
+
     

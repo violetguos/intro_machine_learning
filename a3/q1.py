@@ -14,9 +14,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report,confusion_matrix
 from sklearn.feature_selection import SelectFromModel
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import SelectKBest, chi2
+from sklearn.cluster import KMeans
+from sklearn import tree
 #TODO: KNN, SVM, 
 
 
@@ -56,10 +58,7 @@ def confusion_mat(test_labels, train_labels ):
     k = len(unique_labels)
     conf = np.zeros((k,k))
     #count number of labels
-    for i in unique_labels:
-        for j in range(len(test_labels)):
-            if 
-            
+   
     return 
 
 
@@ -144,16 +143,57 @@ def rand_forest_news(X_train, y_train, X_test, y_test, y_names=None, confusion=F
     print('rand forest baseline test accuracy = {}'.format((test_pred == y_test).mean()))
   
 
-def svm_news():
-    pass    
+def kmeans_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     
+    #vectorizer = TfidfVectorizer(stop_words='english')
+    #X = vectorizer.fit_transform(X_train)
+
+    clf = KMeans(n_clusters=20, init='k-means++', max_iter=100, n_init=1,
+                verbose=opts.verbose)
+    clf.fit(X_train)
+    
+    predictions = clf.predict(X_test)
+
+    #predictions to the index
+
+    
+    closest, _ = sklearn.metrics.pairwise_distances_argmin_min(km.cluster_centers_, X)
+    
+    print closest
+    print y_test
+    
+    print(classification_report(y_test,predictions))
+    print(confusion_matrix(y_test,predictions))
+    
+
 def nn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
-    mlp = MLPClassifier(hidden_layer_sizes=(30,30,30))
+    #20: 0,57
+    #20, 30, 20: 0.58
+    mlp = MLPClassifier(hidden_layer_sizes=(20,30,20))
     mlp.fit(X_train,y_train)
     predictions = mlp.predict(X_test)
     print(classification_report(y_test,predictions))
     print(confusion_matrix(y_test,predictions))
+
+def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
     
+    
+    clf = tree.DecisionTreeClassifier(criterion = "gini", random_state = 100,
+                               max_depth=18, min_samples_leaf=5)
+    #clf = tree.DecisionTreeRegressor()
+    
+    if feature_sel:
+        
+        ch2 = SelectKBest(chi2, k=k_)
+        X_train = ch2.fit_transform(X_train, y_train)
+        X_test = ch2.transform(X_test)
+    
+    clf = clf.fit(X_train, y_train)
+    
+    predictions = clf.predict(X_test)
+    
+    print(classification_report(y_test,predictions))
+    print(confusion_matrix(y_test,predictions))
     
 if __name__ == '__main__':
     train_data, test_data = load_data()
@@ -166,8 +206,19 @@ if __name__ == '__main__':
     #nn_news(train_tf, train_data.target, test_tf,test_data.target)
     
     #test KNN, with different k values
-    k_arr = [10, 100, 1000]
+    #k_arr = [10, 100, 1000]
+    #for k in k_arr:
+    #    print "======================="
+    #    print "k =%d KNN", k
+    #    knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
+    
+    k_arr = [10, 100, 120, 150,155, 160]
+    
     for k in k_arr:
         print "======================="
-        print "k =%d KNN", k
-        knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
+        print "k =%d tree news ", k
+        decision_tree_news(train_tf, train_data.target, test_tf, test_data.target, k, True)
+    
+    #kmeans_news(train_tf, train_data.target, test_tf, test_data.target)
+    
+    

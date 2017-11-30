@@ -15,7 +15,7 @@ Most common word in training set is "the"
 svm baseline train accuracy = 0.974721583878
 svm baseline test accuracy = 0.58682952735
 
-#####NN
+#####NN 30 layers
 11314 train data points.
 101631 feature dimension.
 Most common word in training set is "the"
@@ -86,3 +86,14 @@ avg / total       0.12      0.07      0.07      7532
 accuracy = 0.37, k = 10
 accuracy = 0.53, k = 100
 accuracy = 0.46, k = 1000
+
+
+#####Decision tree, feature selection ######
+180: 0.52
+
+#####decision tree, feature sel, gini #####
+criterion = "gini", random_state = 100, max_depth=30, min_samples_leaf=5
+180: 0.61  
+    
+##### decision tree, feature sel, entropy #####
+                           

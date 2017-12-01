@@ -79,6 +79,7 @@ class SVM(object):
     def __init__(self, c, feature_count):
         self.c = c
         self.w = np.random.normal(0.0, 0.1, feature_count)
+        self.b = 0
         #self.feature_count = feature_count
         
     def hinge_loss(self, X, y):
@@ -112,13 +113,21 @@ class SVM(object):
         '''
         # Compute (sub-)gradient of SVM objective
         n, m = X.shape
+        xt= np.transpose(X)        
+        sum_vec = np.dot(xt, y)
+    
         
-        #dl/dw=yx
-        xt = np.transpose(X)
-        yx = np.dot(xt, y)
-  
         grad = self.w
-        grad = grad -self.c * yx / m
+        
+        c_over_n = self.c * 1.0 / n
+        c_over_n_arr = [c_over_n * 1.0] * m
+        c_over_n_arr[0] = 1 #grad[0]
+        c_over_n_arr = np.asarray(c_over_n_arr)
+        
+        reg_vec = np.multiply(sum_vec, c_over_n_arr)
+        
+        grad = grad - reg_vec #/ n
+        
         return (grad)
     
     def classify(self, X):
@@ -128,23 +137,23 @@ class SVM(object):
         Returns the predicted class labels (shape (n,))
         '''
         # Classify points as +1 or -1
+        #w is shape m
+
         n, m = X.shape #(784, 2757)
         
         xt = np.transpose(X)
         #print xt
         xtw = np.dot(X, self.w)
-        
-        y = xtw
-        print y
+        print("######self b ", self.b)
+        y = xtw +self.b
+        print "y_ classify ", y
         #print y[0]
-        res = np.zeros(m)
-        for i in range(m): 
-            
+        res = np.zeros(n)
+        for i in range(n):             
             if y[i] > 0:
-                res[i] = 1
+                res[i] = 1.0
             else: 
-                res[i] = -1
-        
+                res[i] = -1.0        
         return res
 
 def load_data():
@@ -199,11 +208,7 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
 
     SVM weights can be updated using the attribute 'w'. i.e. 'svm.w = updated_weights'
     
-    penalty is penalty = C in the equation
-    
-    
-    
-    
+    penalty is penalty = C in the equation  
     '''
     #sample, each penalty
     n, m = train_data.shape
@@ -211,34 +216,44 @@ def optimize_svm(train_data, train_targets, penalty, optimizer, batchsize, iters
     svm = SVM(penalty, m)
     w_init = np.sum(svm.w)
     #print w_init
-    w_history = [w_init]
     batch_sampler = BatchSampler(train_data, train_targets, batchsize)
-    batch_train, batch_targets = batch_sampler.get_batch() 
 
 
     for i in range(iters):
-        svm_grad = svm.grad(batch_train, batch_targets)
-        svm.w = (optimizer.update_params(svm.w, svm_grad))# + hinge_loss #+ h_loss))
-        w_history.append(np.sum(svm.w))
+        grad_estimate = 0
+
+        for j in range(int(n/batchsize)):
+            batch_train, batch_targets = batch_sampler.get_batch() 
+            svm_grad = svm.grad(batch_train, batch_targets)
+            grad_estimate += (optimizer.update_params(svm.w, svm_grad))# + hinge_loss #+ h_loss))
+        svm.w = grad_estimate/(n/batchsize)
+    svm.b = -penalty * 1.0/m * np.sum(train_targets)#(batch_targets)
+        
     return svm
 
-def plot_w(svm):
-    i_mean_matrix = np.reshape(svm.w, (28,28))
+def plot_w(w):
+    i_mean_matrix = np.reshape(w, (28,28))
     plt.imshow(i_mean_matrix, cmap='gray')
     plt.show()
-
+    #plt.plot(w)
+    #plt.show()
+    
 def accuracy_func(res, targets):
     '''
     simple accuracy calculation 
     '''
-    n = targets.shape[0]
+    n = len(res) #targets.shape[0]
     accurate = 0
-    for i,j in zip(res, targets):
+    for i in range(n):
         #print i, j
-        if  i == j:
+        if res[i] == targets[i]:
             #print i, j
-            accurate +=1
-    return 1.0 * (accurate)/n
+            accurate = accurate + 1
+    return 1.0*(accurate)/n
+
+def hinge_avg(hinge):
+    return np.mean(hinge)
+
 
 if __name__ == '__main__':
     
@@ -267,27 +282,38 @@ if __name__ == '__main__':
     n_train, m_train = train_data.shape
     n_test, m_test = test_data.shape
     
-    train_ones = np.ones((n_train, 1))
-    np.append(train_data, train_ones, axis=1)
+    #train_ones = np.ones((n_train, 1))
+    np.insert(train_data, 0,1, axis=1)
     
-    test_ones = np.ones((n_test, 1))
-    np.append(test_data, test_ones, axis = 1)
+    #test_ones = np.ones((n_test, 1))
+    np.insert(test_data, 0,1, axis = 1)
     
     
     penalty = 1
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
-    predict = res.classify(test_data)
+    print "svm hinge loss train ", hinge_avg(res.hinge_loss(train_data, train_targets))
+    print "svm hinge loss test ", hinge_avg(res.hinge_loss(test_data, test_targets))
+    pred_train = res.classify(train_data)
+    pred_test = res.classify(test_data)
     
     print "=======  accuracy , momentum = 0 ======="
-    print accuracy_func(predict, test_targets)
+    print "weight, ", res.w
+    print "train accu ,", accuracy_func(pred_train, train_targets)
+
+    print "test accu ,", accuracy_func(pred_test, test_targets)
     
     
     print "======= accuracy, momentum = 0.1 ======="
     gd2 = GDOptimizer(0.05, 0.1, 0)
 
     res2 = optimize_svm(train_data, train_targets, penalty, gd2, 100, 500)
-    predict2 = res2.classify(test_data)
-    print accuracy_func(predict2, test_targets)
+    pred_test2 = res2.classify(test_data)
+    pred_train2 = res2.classify(train_data)
+    print "weight with momem ", res2.w 
+    print "train accu momem ,", accuracy_func(pred_train2, train_targets)
 
-    #plot_w(res)
+    print "test accu  momem ,", accuracy_func(pred_test2, test_targets)
+
+    plot_w(res.w)
+    plot_w(res2.w)
     

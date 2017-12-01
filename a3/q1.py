@@ -105,7 +105,7 @@ def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False
     '''
     predicting using KNN
     '''
-    n_neighbors = 20
+    n_neighbors = 10
     weights = 'uniform'
     #weights = 'distance'
 
@@ -231,18 +231,18 @@ if __name__ == '__main__':
     #nn_news(train_tf, train_data.target, test_tf,test_data.target)
     
     #test KNN, with different k values
-    #k_arr =[180, 320, 350, 500] # [10, 100, 150, 200, 300, 320, 350] #1000]
-    #for k in k_arr:
-    #    print "======================="
-    #    print "k =%d KNN", k
-    #    knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
+    k_arr =[180, 320, 350, 500] # [10, 100, 150, 200, 300, 320, 350] #1000]
+    for k in k_arr:
+        print "======================="
+        print "k =%d KNN", k
+        knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
     
     k_arr = [10, 100, 400, 600]
     
-    for k in k_arr:
-        print "======================="
-        print "k =%d decision tree news ", k
-        decision_tree_news(train_tf, train_data.target, test_tf, test_data.target, k, True)
+    #for k in k_arr:
+    #    print "======================="
+    #    print "k =%d decision tree news ", k
+    #    decision_tree_news(train_tf, train_data.target, test_tf, test_data.target, k, True)
     
     #kmeans_news(train_tf, train_data.target, test_tf, test_data.target)
     

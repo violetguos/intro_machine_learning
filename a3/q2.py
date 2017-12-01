@@ -113,25 +113,12 @@ class SVM(object):
         # Compute (sub-)gradient of SVM objective
         n, m = X.shape
         
-        yt = np.transpose(y)
-        
-        hinge_loss = self.hinge_loss(X, y)
-        
-        #TODO: is W a single constant, or vector???
-        #hinge loss
-        
-        hinge_grad = 0
-        
-            
-        #yx = np.dot(y, X)
+        #dl/dw=yx
+        xt = np.transpose(X)
+        yx = np.dot(xt, y)
   
-        #hinge_grad += yx
-        #print hinge_grad
-        
-        grad = self.w - np.sum(hinge_loss) * self.c/m# yx 
-        #print grad
-        
-        #grad = self.w - np.sum(hinge_loss)
+        grad = self.w
+        grad = grad -self.c * yx / m
         return (grad)
     
     def classify(self, X):
@@ -153,7 +140,7 @@ class SVM(object):
         res = np.zeros(m)
         for i in range(m): 
             
-            if y[i] > 1:
+            if y[i] > 0:
                 res[i] = 1
             else: 
                 res[i] = -1

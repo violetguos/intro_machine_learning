@@ -83,7 +83,7 @@ def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     '''
     predicting using KNN
     '''
-    n_neighbors = 11
+    n_neighbors = 15
     weights = 'uniform'
     weights = 'distance'
     clf = Pipeline([
@@ -94,10 +94,10 @@ def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     clf.fit(X_train, y_train)
     y_predicted = clf.predict(X_test)
     if not confusion:
-        print ('Classification report:', 'magenta') #attrs=['bold'])
+        
         print sklearn.metrics.classification_report(y_test, y_predicted)#, target_names=y_names)
     else:
-        print ('Confusion Matrix:', 'magenta')# attrs=['bold'])
+        
         print sklearn.metrics.confusion_matrix(y_test, y_predicted)
 
 
@@ -105,12 +105,13 @@ def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False
     '''
     predicting using KNN
     '''
-    n_neighbors = 11
+    n_neighbors = 20
     weights = 'uniform'
-    weights = 'distance'
+    #weights = 'distance'
 
-    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors)#, weights=weights)
+    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors, weights=weights)
 
+    
     if feature_sel:
         clf = clf.fit(X_train, y_train)
         ch2 = SelectKBest(chi2, k=k_)
@@ -119,13 +120,15 @@ def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False
 
     
     clf = clf.fit(X_train, y_train)
-    y_predicted = clf.predict(X_test)
+    y_test_predicted = clf.predict(X_test)
+    y_train_predicted = clf.predict(X_train)
     if not confusion:
-        print ('Classification report:', 'magenta') #attrs=['bold'])
-        print sklearn.metrics.classification_report(y_test, y_predicted)#, target_names=y_names)
+        print('KNN train accuracy = {}'.format((y_train_predicted == y_train).mean()))#, target_names=y_names)
+
+        print('KNN test accuracy = {}'.format((y_test_predicted == y_test).mean()))#, target_names=y_names)
     else:
         print ('Confusion Matrix:', 'magenta')# attrs=['bold'])
-        print sklearn.metrics.confusion_matrix(y_test, y_predicted)
+        print sklearn.metrics.confusion_matrix(y_test, y_test_predicted)
 
 
 
@@ -174,7 +177,7 @@ def nn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     predictions = mlp.predict(X_test)
     print(classification_report(y_test,predictions))
     print(confusion_matrix(y_test,predictions))
-
+    
 def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
     
     
@@ -192,33 +195,54 @@ def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, 
     
     predictions = clf.predict(X_test)
     
-    print(classification_report(y_test,predictions))
+    print(sklearn.metrics.accuracy_score(y_test,predictions))
     print(confusion_matrix(y_test,predictions))
+
+'''
+def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
     
+    
+    clf = tree.DecisionTreeClassifier(criterion = "gini", random_state = 100,
+                               max_depth=18, min_samples_leaf=5)
+    #clf = tree.DecisionTreeRegressor()
+    
+    if feature_sel:
+        ch2 = SelectKBest(chi2, k=k_)
+        X_train = ch2.fit_transform(X_train, y_train)
+        X_test = ch2.transform(X_test)
+    
+    clf = clf.fit(X_train, y_train)
+    
+    train_pred = clf.predict(X_train)
+    print('decision tree train accuracy = {}'.format((train_pred == y_train).mean()))
+    
+    test_pred = clf.predict(X_test)
+    print('decision tree test accuracy = {}'.format((test_pred == y_test).mean()))
+ '''   
 if __name__ == '__main__':
     train_data, test_data = load_data()
     train_bow, test_bow, feature_names = bow_features(train_data, test_data)
 
     #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
     train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
+    
     #knn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #nn_news(train_tf, train_data.target, test_tf,test_data.target)
     
     #test KNN, with different k values
-    #k_arr = [10, 100, 1000]
+    #k_arr =[180, 320, 350, 500] # [10, 100, 150, 200, 300, 320, 350] #1000]
     #for k in k_arr:
     #    print "======================="
     #    print "k =%d KNN", k
     #    knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
     
-    k_arr = [10, 100, 120, 150,155, 160]
+    k_arr = [10, 100, 400, 600]
     
     for k in k_arr:
         print "======================="
-        print "k =%d tree news ", k
+        print "k =%d decision tree news ", k
         decision_tree_news(train_tf, train_data.target, test_tf, test_data.target, k, True)
     
     #kmeans_news(train_tf, train_data.target, test_tf, test_data.target)
-    
     

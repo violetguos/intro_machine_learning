@@ -32,34 +32,54 @@
 
 %%%%%%%%%%%Q1 	20 NEWS GROUP  %%%%%%%%%%%%%%
 \section{20 News Group}
-\subsection{Algorithms}
-\subsubsection{KNN}
-k = 20\\
-Feature selection:\\
-=======================
-f = 180
-KNN train accuracy = 0.510783100583
-KNN test accuracy = 0.438263409453
-=======================
-k =KNN 320
-KNN train accuracy = 0.56222379353
-KNN test accuracy = 0.456850770048
-=======================
-k = KNN 350
-KNN train accuracy = 0.565847622415
-KNN test accuracy = 0.458311205523
-=======================
-k = KNN 500
-KNN train accuracy = 0.562047021389
-KNN test accuracy = 0.445698353691
+\subsection{Top 3 Algorithms}
+\subsubsection{Neural Network}
+\begin{enumerate}
 
-\subsubsection{Decision Tree}
-criterion = "gini", random_state = 100, max_depth=30, min_samples_leaf=5
-number of features to split: 10, 120, 150, 160 \\
+    \item Hypterparameter
+	
+	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network. It turns out that the single neural network is the fastest and also most accurate.
 
+	\item Train/test loss
+	\begin{itemize}
+     \item  Train accuracy
+     \item Test accuracy
+        \end{itemize}
+      \item My expectations
+  
+\end{enumerate}
 
 \subsubsection{Random forest}
-sfgdf
+\begin{enumerate}
+
+    \item Hypterparameter
+	
+	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network. It turns out that the single neural network is the fastest and also most accurate.
+
+	\item Train/test loss
+	\begin{itemize}
+     \item  Train accuracy
+     \item Test accuracy
+        \end{itemize}
+      \item My expectations
+  
+\end{enumerate}
+
+\subsubsection{SVM}
+\begin{enumerate}
+
+    \item Hypterparameter
+	
+	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network. It turns out that the single neural network is the fastest and also most accurate.
+
+	\item Train/test loss
+	\begin{itemize}
+     \item  Train accuracy
+     \item Test accuracy
+        \end{itemize}
+      \item My expectations
+  
+\end{enumerate}
 
 %%%%%%%%%%%Q2 SVM %%%%%%%%%%%%%%
 \section{SVM}
@@ -78,22 +98,31 @@ Assume K is symmetric, we can decompose K into $U \Lambda U^T$
 \begin{equation*}
 \begin{split}
 x^T K x &= x^T (U \Lambda U^T) x = (x^T U) \Lambda (U^T x)\\
+\end{split}
+\end{equation*}
+
+$\Lambda$ has the eigenvalues $\lambda_{i}$, and 
+
+\begin{equation*}
+\begin{split}
 &= \Sigma_{i =1}^{d} \lambda_{i} ([x^T U_{i}])^2 >= 0\\
 \end{split}
 \end{equation*}
+
 
 %%%%%%%%%Q 3.2 %%%%%%%%%%%%%%
 \subsection{Kernel properties}
 %%%%%%%% Q 3.2 q2%%%%%%%%%%%%%
 \subsubsection{$\alpha$}
- $K_{ij} = \alpha $, the matrix K has dimension of x or y, and each element is $\alpha$. Since $\alpha$ > 0, and all elements are eqaul, K is positive semidefinite
+Define mapping $\phi (x) = \sqrt{\alpha}$, and the kernel $\langle \phi(x), \phi(y) \rangle = \alpha$.
+The resulting matrix K has item $K_{ij} = \alpha $, the matrix K has equal number of row and columns, and each element is $\alpha$. Since $\alpha$ > 0, and all elements are equal, K is positive semidefinite
  
  %%%%%%%Q 3.2 q3 %%%%%%%%%%%%%%
 \subsubsection{$f(x), f(y)$}
-$K_{ij} = <\phi (x),  \phi (y) >$, \\
+$K_{ij} = \langle \phi (x),  \phi (y) \rangle$, \\
 define $\phi(x) = f(x), \forall f: \mathbb{R}^{d} \rightarrow \mathbb{R}$\\
 define $\phi(y) = f(y), \forall f: \mathbb{R}^{d} \rightarrow \mathbb{R}$\\
-Since f(x) and f(y) produce a scalar,  $<\phi (x),  \phi (y) > = f(x) \cdot f(y)$
+Since f(x) and f(y) produce a scalar,  $\langle \phi (x),  \phi (y) \rangle = f(x) \cdot f(y)$
 
 %%%%%%%%Q3.2 part 3%%%%%%%%%%%
 \subsubsection{k1 and k2}

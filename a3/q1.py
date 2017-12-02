@@ -14,11 +14,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report,confusion_matrix
 from sklearn.feature_selection import SelectFromModel
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.cluster import KMeans
 from sklearn import tree
+from sklearn.linear_model import Perceptron
 #TODO: KNN, SVM, 
 
 
@@ -83,22 +84,15 @@ def svm_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     '''
     predicting using KNN
     '''
-    n_neighbors = 15
-    weights = 'uniform'
-    weights = 'distance'
-    clf = Pipeline([
-  ('feature_selection', SelectFromModel(LinearSVC(penalty="l1"))),
-  ('classification', sklearn.neighbors.KNeighborsClassifier())
-])
+ 
+    clf = LinearSVC(random_state=0)
     #clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors)#, weights=weights)
     clf.fit(X_train, y_train)
-    y_predicted = clf.predict(X_test)
-    if not confusion:
-        
-        print sklearn.metrics.classification_report(y_test, y_predicted)#, target_names=y_names)
-    else:
-        
-        print sklearn.metrics.confusion_matrix(y_test, y_predicted)
+    train_pred = clf.predict(X_train)
+    print('svm train accuracy = {}'.format((train_pred == y_train).mean()))
+    
+    test_pred = clf.predict(X_test)
+    print('svm test accuracy = {}'.format((test_pred == y_test).mean()))
 
 
 def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False, feature_sel=False):
@@ -172,12 +166,22 @@ def kmeans_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False)
 def nn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
     #20: 0,57
     #20, 30, 20: 0.58
-    mlp = MLPClassifier(hidden_layer_sizes=(20,30,20))
-    mlp.fit(X_train,y_train)
-    predictions = mlp.predict(X_test)
-    print(classification_report(y_test,predictions))
-    print(confusion_matrix(y_test,predictions))
+    nn_layers = {
+            'Single neuron':Perceptron(),
+            'hidden layer': MLPClassifier(hidden_layer_sizes=(10, 20, 10))
+            }
     
+    
+    for cls_name, cls in nn_layers.items():
+        cls.fit(X_train,y_train)
+        predictions = cls.predict(X_test)
+        train_pred = cls.predict(X_train)
+        print cls_name
+        print('nn train accuracy = {}'.format((train_pred == y_train).mean()))
+        
+        test_pred = cls.predict(X_test)
+        print('nn test accuracy = {}'.format((test_pred == y_test).mean()))
+        
 def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
     
     
@@ -226,18 +230,19 @@ if __name__ == '__main__':
     #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
     train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
     
+    #svm_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #knn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
-    #nn_news(train_tf, train_data.target, test_tf,test_data.target)
+    nn_news(train_tf, train_data.target, test_tf,test_data.target)
     
     #test KNN, with different k values
-    k_arr =[180, 320, 350, 500] # [10, 100, 150, 200, 300, 320, 350] #1000]
-    for k in k_arr:
-        print "======================="
-        print "k =%d KNN", k
-        knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
+    #k_arr =[180, 320, 350, 500] # [10, 100, 150, 200, 300, 320, 350] #1000]
+    #for k in k_arr:
+    #    print "======================="
+    #    print "k =%d KNN", k
+    #    knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
     
-    k_arr = [10, 100, 400, 600]
+    #k_arr = [10, 100, 400, 600]
     
     #for k in k_arr:
     #    print "======================="

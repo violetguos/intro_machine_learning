@@ -299,7 +299,6 @@ if __name__ == '__main__':
     print "=======  accuracy , momentum = 0 ======="
     print "weight, ", res.w
     print "train accu ,", accuracy_func(pred_train, train_targets)
-
     print "test accu ,", accuracy_func(pred_test, test_targets)
     
     
@@ -311,7 +310,6 @@ if __name__ == '__main__':
     pred_train2 = res2.classify(train_data)
     print "weight with momem ", res2.w 
     print "train accu momem ,", accuracy_func(pred_train2, train_targets)
-
     print "test accu  momem ,", accuracy_func(pred_test2, test_targets)
 
     plot_w(res.w)

@@ -22,7 +22,7 @@ from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.cluster import KMeans
 from sklearn import tree
 from sklearn.linear_model import Perceptron
-#TODO: KNN, SVM, 
+from pprint import pprint
 
 
 def load_data():
@@ -122,6 +122,10 @@ def svm_cross_val(X_train, y_train, X_test, y_test):
     optimal_rand = all_accuracy.argmax()
     print "Cross Validate result: rand state = ", optimal_rand
     
+    #use the optimal, get the confusion matrix
+    
+    
+    
     
     
 
@@ -148,8 +152,15 @@ def svm_news(X_train, y_train, X_test, y_test, rand_, y_names=None, confusion=Fa
     print "isolate test", test_accuracy
     print('svm test accuracy = {}'.format((test_pred == y_test).mean()))
     print('svm train confustion matrix')
-    print test_conf
-    
+    #pprint(test_conf.tolist())
+    #print test_conf
+    for i in range(20):
+        for j in range(20):
+            if j < 19:
+                print test_conf[i][j], '&',
+            else:
+                print test_conf[i][j], '\\\\'
+            
     return test_accuracy
 
 
@@ -279,7 +290,10 @@ if __name__ == '__main__':
     
     #TOP 3 algorithms
     #SVM is the best
-    svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    #svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    svm_news(train_tf, train_data.target,test_tf, test_data.target, 0, y_names=None, confusion=False)
+    # arr is the numpy ndarray
+
     #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     #nn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
     

@@ -144,9 +144,9 @@ class SVM(object):
         xt = np.transpose(X)
         #print xt
         xtw = np.dot(X, self.w)
-        print("######self b ", self.b)
+        #print("######self b ", self.b)
         y = xtw +self.b
-        print "y_ classify ", y
+        #print "y_ classify ", y
         #print y[0]
         res = np.zeros(n)
         for i in range(n):             
@@ -257,12 +257,12 @@ def hinge_avg(hinge):
 
 if __name__ == '__main__':
     
-    """
+    
     gd1 = GDOptimizer(1, 0)
     opt_test_1 =  optimize_test_function(gd1)
     gd2 = GDOptimizer(1, 0.9)
     opt_test_2 = optimize_test_function(gd2)
-    
+    print "========Q2.1 start =============="
     print "=====opt test beta = 0===="
     plt.plot(opt_test_1, label = 'beta = 0 ')
     #plt.show()
@@ -271,20 +271,20 @@ if __name__ == '__main__':
     plt.title("SGD test")
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.show()
-
-    """
+    print "=======Q2.1 end ==============="
+    print
     
-    print "==========SVM ==========="
+    
+    
+    print "==========Q2.2 and 2.3 SVM ==========="
     gd1 = GDOptimizer(0.05, 0, 0)
     train_data, train_targets, test_data, test_targets = load_data()
     
     #Add one to bias
     n_train, m_train = train_data.shape
     n_test, m_test = test_data.shape
-    
     #train_ones = np.ones((n_train, 1))
     np.insert(train_data, 0,1, axis=1)
-    
     #test_ones = np.ones((n_test, 1))
     np.insert(test_data, 0,1, axis = 1)
     
@@ -308,10 +308,13 @@ if __name__ == '__main__':
     res2 = optimize_svm(train_data, train_targets, penalty, gd2, 100, 500)
     pred_test2 = res2.classify(test_data)
     pred_train2 = res2.classify(train_data)
-    print "weight with momem ", res2.w 
-    print "train accu momem ,", accuracy_func(pred_train2, train_targets)
-    print "test accu  momem ,", accuracy_func(pred_test2, test_targets)
+    print "weight with momentum ", res2.w 
+    print "train accu momentum ,", accuracy_func(pred_train2, train_targets)
+    print "test accu  momentum ,", accuracy_func(pred_test2, test_targets)
 
+    print "plot W, momemtum = 0"
     plot_w(res.w)
+    
+    print "plot W, momemtum = 0.1"
     plot_w(res2.w)
     

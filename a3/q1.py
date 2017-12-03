@@ -78,8 +78,11 @@ def confusion_mat(true_labels, predict_labels):
     for i in range(20):
         for j in range(20):
             conf[i][j] = abs(true_cate[j] - pred_cate[i])
+        
     return conf
 
+def most_confused_class(conf_mat):
+    return np.unravel_index(conf_mat.argmax, conf_mat.shape())
 
 
 def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
@@ -149,19 +152,153 @@ def svm_news(X_train, y_train, X_test, y_test, rand_, y_names=None, confusion=Fa
     test_pred = clf.predict(X_test)
     test_conf =  confusion_mat(y_test, test_pred)
     test_accuracy = (test_pred == y_test).mean()
-    print "isolate test", test_accuracy
+    
     print('svm test accuracy = {}'.format((test_pred == y_test).mean()))
     print('svm train confustion matrix')
     #pprint(test_conf.tolist())
-    #print test_conf
-    for i in range(20):
-        for j in range(20):
-            if j < 19:
-                print test_conf[i][j], '&',
-            else:
-                print test_conf[i][j], '\\\\'
+    print test_conf
+    print "most confused classes = ", most_confused_class(conf)
+    
+    #for i in range(20):
+    #    for j in range(20):
+    #        if j < 19:
+    #            print test_conf[i][j], '&',
+    #        else:
+    #            print test_conf[i][j], '\\\\'
             
     return test_accuracy
+
+
+
+
+def rand_forest_cross_val(X_train, y_train, X_test, y_test):
+    num_est_arr = [10, 30, 50, 80, 100, 120, 150]
+    
+    all_accuracy = []
+    
+    for num_est in num_est_arr:
+        # Loop over folds
+        # Evaluate SVMs
+        # ...
+        
+        kf = KFold(n_splits=10)
+        fold_test_accuracy = []
+        for train_index, test_index in kf.split(X_train):
+            x_train_fold, x_test_fold = X_train[train_index], X_train[test_index]
+            y_train_fold, y_test_fold = y_train[train_index], y_train[test_index]
+            rand_forest_res = rand_forest_news(x_train_fold, y_train_fold, x_test_fold, y_test_fold, num_est)
+            fold_test_accuracy.append(rand_forest_res)
+    
+        fold_accuracy = (1.0 *sum(fold_test_accuracy)) / (1.0 *len(fold_test_accuracy))   
+        all_accuracy.append(fold_accuracy)
+    all_accuracy = np.array(all_accuracy)
+    optimal_rand = all_accuracy.argmax()
+    print "Cross Validate result: rand state = ", optimal_rand
+    
+
+def rand_forest_news(X_train, y_train, X_test, y_test, n_estimate, y_names=None, confusion=False):
+    clf = RandomForestClassifier(n_estimators= n_estimate)
+    clf.fit(X_train, y_train)
+    
+    #evaluate accuracy
+    print "=============="
+    print "Random forest ensamble algorithm"
+    print "Fold with num_estimators = ",n_estimate
+    train_pred = clf.predict(X_train)
+    print('rand forest baseline train accuracy = {}'.format((train_pred == y_train).mean()))
+    
+    test_pred = clf.predict(X_test)
+    print('rand forest baseline test accuracy = {}'.format((test_pred == y_test).mean()))
+    test_accuracy = (test_pred == y_test).mean()
+    return test_accuracy
+  
+
+
+def nn_news_cross_val(X_train, y_train, X_test, y_test):
+    nn_layers = {
+            'Single neuron neural network':Perceptron(),
+            'hidden layer: (1, 2, 1)': MLPClassifier(hidden_layer_sizes=(1, 2, 1)),
+            'hidden layer: (5, 10, 5)':MLPClassifier(hidden_layer_sizes=(5, 10, 5)),
+            'hidden layer: (10, 20, 10)': MLPClassifier(hidden_layer_sizes=(10, 20, 10)),
+            'hidden layer: (15, 25, 15)': MLPClassifier(hidden_layer_sizes=(15, 25, 15)),   
+            }
+    all_accuracy = []
+    
+    for cls_name, cls in nn_layers.items():
+        # Loop over folds
+        # Evaluate NNs
+        print "NN fold with layer ",cls_name
+        kf = KFold(n_splits=10)
+        fold_test_accuracy = []
+        for train_index, test_index in kf.split(X_train):
+            x_train_fold, x_test_fold = X_train[train_index], X_train[test_index]
+            y_train_fold, y_test_fold = y_train[train_index], y_train[test_index]
+            nn_res = nn_news(cls, x_train_fold, y_train_fold, x_test_fold, y_test_fold)
+            fold_test_accuracy.append(nn_res)
+    
+        fold_accuracy = (1.0 *sum(fold_test_accuracy)) / (1.0 *len(fold_test_accuracy))   
+        all_accuracy.append(fold_accuracy)
+    all_accuracy = np.array(all_accuracy)
+    optimal_rand = all_accuracy.argmax()
+    print "Cross Validate result: nn layer = ", optimal_rand
+    
+    
+
+def nn_news(cls, X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+      
+    cls.fit(X_train,y_train)
+    predictions = cls.predict(X_test)
+    train_pred = cls.predict(X_train)
+    print "======================="
+    
+    print('nn train accuracy = {}'.format((train_pred == y_train).mean()))
+
+        
+        
+    test_pred = cls.predict(X_test)
+    print('nn test accuracy = {}'.format((test_pred == y_test).mean()))
+    test_accuracy = (test_pred == y_test).mean()
+    
+    return test_accuracy
+    
+    
+    
+
+def kmeans_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
+    
+    #vectorizer = TfidfVectorizer(stop_words='english')
+    #X = vectorizer.fit_transform(X_train)
+
+    clf = KMeans(n_clusters=20, init='k-means++', max_iter=100, n_init=1,
+                verbose=opts.verbose)
+    clf.fit(X_train)
+    
+    predictions = clf.predict(X_test)
+
+    #predictions to the index
+    closest, _ = sklearn.metrics.pairwise_distances_argmin_min(km.cluster_centers_, X)
+    
+    print closest
+    print y_test
+    
+    print(classification_report(y_test,predictions))       
+        
+def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
+    
+    
+    clf = tree.DecisionTreeClassifier(criterion = "entropy", random_state = 100,
+                               max_depth=18, min_samples_leaf=5)
+    #clf = tree.DecisionTreeRegressor()
+    
+    if feature_sel:
+        
+        ch2 = SelectKBest(chi2, k=k_)
+        X_train = ch2.fit_transform(X_train, y_train)
+        X_test = ch2.transform(X_test)
+    
+    clf = clf.fit(X_train, y_train)
+    predictions = clf.predict(X_test)
+    print('Decision tree accuracy = {}'.format((y_test == predictions).mean()))
 
 
 def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False, feature_sel=False):
@@ -195,91 +332,6 @@ def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False
 
 
 
-
-def rand_forest_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
-    clf = RandomForestClassifier(n_estimators=100)
-    clf.fit(X_train, y_train)
-    
-    #evaluate accuracy
-    print "=============="
-    print "Random forest ensamble algorithm"
-    train_pred = clf.predict(X_train)
-    print('rand forest baseline train accuracy = {}'.format((train_pred == y_train).mean()))
-    
-    test_pred = clf.predict(X_test)
-    print('rand forest baseline test accuracy = {}'.format((test_pred == y_test).mean()))
-  
-
-def kmeans_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
-    
-    #vectorizer = TfidfVectorizer(stop_words='english')
-    #X = vectorizer.fit_transform(X_train)
-
-    clf = KMeans(n_clusters=20, init='k-means++', max_iter=100, n_init=1,
-                verbose=opts.verbose)
-    clf.fit(X_train)
-    
-    predictions = clf.predict(X_test)
-
-    #predictions to the index
-
-    
-    closest, _ = sklearn.metrics.pairwise_distances_argmin_min(km.cluster_centers_, X)
-    
-    print closest
-    print y_test
-    
-    print(classification_report(y_test,predictions))
-    
-
-def nn_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
-    #20: 0,57
-    #20, 30, 20: 0.58
-    nn_layers = {
-            'Single neuron neural network':Perceptron(),
-            #'hidden layer': MLPClassifier(hidden_layer_sizes=(10, 20, 10))
-            }
-    
-    
-    for cls_name, cls in nn_layers.items():
-        cls.fit(X_train,y_train)
-        predictions = cls.predict(X_test)
-        train_pred = cls.predict(X_train)
-        print "======================="
-        print cls_name
-        print('nn train accuracy = {}'.format((train_pred == y_train).mean()))
-        #train_conf =  confusion_mat(y_train, train_pred)
-        #print train_conf
-        
-        
-        test_pred = cls.predict(X_test)
-        print('nn test accuracy = {}'.format((test_pred == y_test).mean()))
-        #print('nn test confustion matrix')
-        #test_conf =  confusion_mat(y_test, test_pred)
-        #print test_conf
-        
-        
-def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
-    
-    
-    clf = tree.DecisionTreeClassifier(criterion = "gini", random_state = 100,
-                               max_depth=18, min_samples_leaf=5)
-    #clf = tree.DecisionTreeRegressor()
-    
-    if feature_sel:
-        
-        ch2 = SelectKBest(chi2, k=k_)
-        X_train = ch2.fit_transform(X_train, y_train)
-        X_test = ch2.transform(X_test)
-    
-    clf = clf.fit(X_train, y_train)
-    
-    predictions = clf.predict(X_test)
-    
-    print(sklearn.metrics.accuracy_score(y_test,predictions))
-
-
-
  
 if __name__ == '__main__':
     train_data, test_data = load_data()
@@ -291,11 +343,10 @@ if __name__ == '__main__':
     #TOP 3 algorithms
     #SVM is the best
     #svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    svm_news(train_tf, train_data.target,test_tf, test_data.target, 0, y_names=None, confusion=False)
     # arr is the numpy ndarray
 
-    #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
-    #nn_news(train_tf, train_data.target, test_tf, test_data.target, feature_tf_names)
+    #rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    nn_news_cross_val(train_tf, train_data.target, test_tf, test_data.target)
     
     
     

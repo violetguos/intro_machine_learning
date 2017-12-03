@@ -173,7 +173,7 @@ def svm_news(X_train, y_train, X_test, y_test, rand_, y_names=None, confusion=Fa
 
 def rand_forest_cross_val(X_train, y_train, X_test, y_test):
     num_est_arr = [10, 30, 50, 80, 100, 120, 150]
-    
+    best_est = [150]
     all_accuracy = []
     
     for num_est in num_est_arr:
@@ -193,7 +193,8 @@ def rand_forest_cross_val(X_train, y_train, X_test, y_test):
         all_accuracy.append(fold_accuracy)
     all_accuracy = np.array(all_accuracy)
     optimal_rand = all_accuracy.argmax()
-    print "Cross Validate result: rand state = ", optimal_rand
+
+    print "Cross Validate result: rand state = ", num_est_arr[optimal_rand]
     
 
 def rand_forest_news(X_train, y_train, X_test, y_test, n_estimate, y_names=None, confusion=False):
@@ -222,6 +223,8 @@ def nn_news_cross_val(X_train, y_train, X_test, y_test):
             'hidden layer: (10, 20, 10)': MLPClassifier(hidden_layer_sizes=(10, 20, 10)),
             'hidden layer: (15, 25, 15)': MLPClassifier(hidden_layer_sizes=(15, 25, 15)),   
             }
+    #NOTE: a single neuron NN is a perceptron
+    
     all_accuracy = []
     
     for cls_name, cls in nn_layers.items():
@@ -240,7 +243,8 @@ def nn_news_cross_val(X_train, y_train, X_test, y_test):
         all_accuracy.append(fold_accuracy)
     all_accuracy = np.array(all_accuracy)
     optimal_rand = all_accuracy.argmax()
-    print "Cross Validate result: nn layer = ", optimal_rand
+  
+    print "Cross Validate result: nn layer = ", nn_layers.items()[optimal_rand][0]
     
     
 
@@ -253,119 +257,25 @@ def nn_news(cls, X_train, y_train, X_test, y_test, y_names=None, confusion=False
     
     print('nn train accuracy = {}'.format((train_pred == y_train).mean()))
 
-        
-        
     test_pred = cls.predict(X_test)
     print('nn test accuracy = {}'.format((test_pred == y_test).mean()))
     test_accuracy = (test_pred == y_test).mean()
     
     return test_accuracy
     
-    
-    
-
-def kmeans_news(X_train, y_train, X_test, y_test, y_names=None, confusion=False):
-    
-    #vectorizer = TfidfVectorizer(stop_words='english')
-    #X = vectorizer.fit_transform(X_train)
-
-    clf = KMeans(n_clusters=20, init='k-means++', max_iter=100, n_init=1,
-                verbose=opts.verbose)
-    clf.fit(X_train)
-    
-    predictions = clf.predict(X_test)
-
-    #predictions to the index
-    closest, _ = sklearn.metrics.pairwise_distances_argmin_min(km.cluster_centers_, X)
-    
-    print closest
-    print y_test
-    
-    print(classification_report(y_test,predictions))       
-        
-def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
-    
-    
-    clf = tree.DecisionTreeClassifier(criterion = "entropy", random_state = 100,
-                               max_depth=18, min_samples_leaf=5)
-    #clf = tree.DecisionTreeRegressor()
-    
-    if feature_sel:
-        
-        ch2 = SelectKBest(chi2, k=k_)
-        X_train = ch2.fit_transform(X_train, y_train)
-        X_test = ch2.transform(X_test)
-    
-    clf = clf.fit(X_train, y_train)
-    predictions = clf.predict(X_test)
-    print('Decision tree accuracy = {}'.format((y_test == predictions).mean()))
-
-
-def knn_news(X_train, y_train, X_test, y_test, k_, y_names=None, confusion=False, feature_sel=False):
-    '''
-    predicting using KNN
-    '''
-    n_neighbors = 10
-    weights = 'uniform'
-    #weights = 'distance'
-
-    clf = sklearn.neighbors.KNeighborsClassifier(n_neighbors, weights=weights)
-
-    
-    if feature_sel:
-        clf = clf.fit(X_train, y_train)
-        ch2 = SelectKBest(chi2, k=k_)
-        X_train = ch2.fit_transform(X_train, y_train)
-        X_test = ch2.transform(X_test)
-
-    
-    clf = clf.fit(X_train, y_train)
-    y_test_predicted = clf.predict(X_test)
-    y_train_predicted = clf.predict(X_train)
-    if not confusion:
-        print('KNN train accuracy = {}'.format((y_train_predicted == y_train).mean()))#, target_names=y_names)
-
-        print('KNN test accuracy = {}'.format((y_test_predicted == y_test).mean()))#, target_names=y_names)
-    else:
-        print ('Confusion Matrix:', 'magenta')# attrs=['bold'])
-
-
-
+ 
 
  
 if __name__ == '__main__':
     train_data, test_data = load_data()
     train_bow, test_bow, feature_names = bow_features(train_data, test_data)
 
-    bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
+    #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
     train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
     
     #TOP 3 algorithms
     #SVM is the best
-    #svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    # arr is the numpy ndarray
-
-    #rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
     nn_news_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    
-    
-    
-    #NOTE: here's the algorithms that I tried and got low
-    #Accuracy.
-    
-    
-    #test KNN, with different k values
-    #k_arr =[180, 320, 350, 500] # [10, 100, 150, 200, 300, 320, 350] #1000]
-    #for k in k_arr:
-    #    print "======================="
-    #    print "k =%d KNN", k
-    #    knn_news(train_tf, train_data.target, test_tf, test_data.target,k, feature_tf_names, False, True)
-    
-    #k_arr = [10, 100, 400, 600]
-    #for k in k_arr:
-    #    print "======================="
-    #    print "k =%d decision tree news ", k
-    #    decision_tree_news(train_tf, train_data.target, test_tf, test_data.target, k, True)
-    
-    #kmeans_news(train_tf, train_data.target, test_tf, test_data.target)
     

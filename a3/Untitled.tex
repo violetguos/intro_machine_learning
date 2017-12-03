@@ -65,7 +65,7 @@
   
 \end{enumerate}
 
-\subsubsection{SVM}
+\subsubsection{SVM - Best Classifier}
 \begin{enumerate}
 
     \item Hypterparameter
@@ -74,12 +74,25 @@
 
 	\item Train/test loss
 	\begin{itemize}
-     \item  Train accuracy
-     \item Test accuracy
+     \item  Train accuracy  0.972511932119
+     \item Test accuracy 0.691980881572
         \end{itemize}
       \item My expectations
   
 \end{enumerate}
+
+\subsubsection{Bernoulli Baseline}
+\begin{enumerate}
+	\item Train/test loss
+	\begin{itemize}
+     \item  Train accuracy  0.598727240587
+     \item Test accuracy 0.457912904939
+        \end{itemize}
+\end{enumerate}
+
+
+
+
 
 %%%%%%%%%%%Q2 SVM %%%%%%%%%%%%%%
 \section{SVM}
@@ -101,20 +114,21 @@ x^T K x &= x^T (U \Lambda U^T) x = (x^T U) \Lambda (U^T x)\\
 \end{split}
 \end{equation*}
 
-$\Lambda$ has the eigenvalues $\lambda_{i}$, and 
+$\Lambda$ has the eigenvalues $\lambda_{i}$, and if $K$ is positive, and all $\lambda_{i}$ > 0,
 
 \begin{equation*}
 \begin{split}
-&= \Sigma_{i =1}^{d} \lambda_{i} ([x^T U_{i}])^2 >= 0\\
+x^T K x &= \Sigma_{i =1}^{d} \lambda_{i} ([x^T U_{i}])^2 >= 0\\
 \end{split}
 \end{equation*}
 
+Then $x^T K x >= 0$ for all $x$ in $ \mathbb{R}^{d}$
 
 %%%%%%%%%Q 3.2 %%%%%%%%%%%%%%
 \subsection{Kernel properties}
 %%%%%%%% Q 3.2 q2%%%%%%%%%%%%%
 \subsubsection{$\alpha$}
-Define mapping $\phi (x) = \sqrt{\alpha}$, and the kernel $\langle \phi(x), \phi(y) \rangle = \alpha$.
+Define mapping $\phi (x) = \sqrt{\alpha}$, $\alpha > 0$, and the kernel $\langle \phi(x), \phi(y) \rangle = \alpha$.
 The resulting matrix K has item $K_{ij} = \alpha $, the matrix K has equal number of row and columns, and each element is $\alpha$. Since $\alpha$ > 0, and all elements are equal, K is positive semidefinite
  
  %%%%%%%Q 3.2 q3 %%%%%%%%%%%%%%
@@ -136,7 +150,7 @@ We define a new mapping, $\phi$ for $k(x ,y)$\\
 We let $\phi(x) = \frac{\phi_{1} (x)}{\norm{\phi_{1}(x)}}$\\
 \begin{equation*}
 \begin{split}
-k(x, y) &= <\phi (x), \phi (y)>\\
+k(x, y) &= \langle \phi (x), \phi (y) \rangle \\
 &= \frac{\phi_{1}(x)}{\norm{\phi_{1}(x)}} \cdot  \frac{\phi_{1}(y)}{\norm{\phi_{1}(y)}}\\
 &= \frac{\phi_{1}(x)}{\sqrt{\phi_{1}(x) \cdot \phi_{1}(x)}} \cdot \frac{\phi_{1}(y)}{\sqrt{\phi_{1}(y) \cdot \phi_{1}(y)}}\\
 &= \frac{\phi_{1}(x)}{( \sqrt{\phi_{1}(x)} \cdot \sqrt{ \phi_{1}(y)}  )}  \cdot \frac{\phi_{1}(y)}{( \sqrt{\phi_{1}(x)} \cdot \sqrt{ \phi_{1}(y)}  )} \\
@@ -144,6 +158,7 @@ k(x, y) &= <\phi (x), \phi (y)>\\
  k(x, y) &= \frac{k_{1}(x ,y) }{\sqrt{k_{1}(x, x)} \sqrt{k_{1}(y, y)} }
 \end{split}
 \end{equation*}
-
+Therefore, there is a new mapping $\phi(x)$ that supports $k(x, y)$ and it is a kernel because $\phi(x)$
+is the product of two kernel mappings
 
 \end{document}

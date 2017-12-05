@@ -297,9 +297,9 @@ if __name__ == '__main__':
     pred_test = res.classify(test_data)
     
     print "=======  accuracy , momentum = 0 ======="
-    print "weight, ", res.w
-    print "train accu ,", accuracy_func(pred_train, train_targets)
-    print "test accu ,", accuracy_func(pred_test, test_targets)
+    #print "weight, ", res.w
+    print "test accu ,", accuracy_func(pred_train, train_targets)
+    print "train accu ,", accuracy_func(pred_test, test_targets)
     
     
     print "======= accuracy, momentum = 0.1 ======="
@@ -308,9 +308,9 @@ if __name__ == '__main__':
     res2 = optimize_svm(train_data, train_targets, penalty, gd2, 100, 500)
     pred_test2 = res2.classify(test_data)
     pred_train2 = res2.classify(train_data)
-    print "weight with momentum ", res2.w 
-    print "train accu momentum ,", accuracy_func(pred_train2, train_targets)
-    print "test accu  momentum ,", accuracy_func(pred_test2, test_targets)
+    #print "weight with momentum ", res2.w 
+    print "test accu momentum ,", accuracy_func(pred_train2, train_targets)
+    print "train accu  momentum ,", accuracy_func(pred_test2, test_targets)
 
     print "plot W, momemtum = 0"
     plot_w(res.w)

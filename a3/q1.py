@@ -64,17 +64,25 @@ def confusion_mat(true_labels, predict_labels):
 
     #count number of labels for each of the 20 categories
     #for i in range(20):
-    for j in range(len(true_labels)):
+    print "******************NOTICE ME***************"
+    print len(true_labels)
+    for j in range(len(predict_labels)):
         curr_true_class = true_labels[j]
-        for ii in range(len(predict_labels)):
-            curr_pred_class = predict_labels[ii]#0 to 19
-            conf[int(curr_true_class)][int(curr_pred_class)] +=1    
-                    
-        
+        #for i in range(len(predict_labels)):
+        curr_pred_class = predict_labels[j]#0 to 19
+        conf[int(curr_pred_class)][int(curr_true_class)] +=1    
     return conf
 
 def most_confused_class(conf_mat):
-    return np.unravel_index(conf_mat.argmax(), conf_mat.shape)
+    conf_max = 0
+    for i in range(20):
+        for j in range(20):
+            if i != j:
+                if conf_mat[i][j] > conf_max:
+                    ci = i
+                    cj = j
+                    conf_max = conf_mat[i][j]
+    return ci, cj #np.unravel_index(conf_mat.argmax(), conf_mat.shape)
 
 
 def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
@@ -138,22 +146,23 @@ def svm_news(X_train, y_train, X_test, y_test, rand_, y_names=None, confusion=Fa
     train_pred = clf.predict(X_train)
     print('svm train accuracy = {}'.format((train_pred == y_train).mean()))
     print('svm train confustion matrix')
-    train_conf =  confusion_mat(y_train, train_pred)
-    print train_conf
+
     
     test_pred = clf.predict(X_test)
     test_conf =  confusion_mat(y_test, test_pred)
     test_accuracy = (test_pred == y_test).mean()
     
+    
     print('svm test accuracy = {}'.format((test_pred == y_test).mean()))
     print('svm train confustion matrix')
     #pprint(test_conf.tolist())
-    print test_conf.max()
+    print test_conf
     ci, cj  = most_confused_class(test_conf)
     #print "u est shape", y_names.shape
-    print "most confused classes = ", y_names[ci], y_names[cj]
     
+    print "most confused classes = ", ci, y_names[ci], cj, y_names[cj]
     
+    #for latex
     #for i in range(20):
     #    for j in range(20):
     #        if j < 19:
@@ -279,6 +288,7 @@ if __name__ == '__main__':
     #print set(train_data.target)# 0 to 19
     
     #final result with The picked hyperparameters
+    #print test_data.target.shape
     svm_news(train_tf, train_data.target, test_tf, test_data.target, 0 , categories_20, confusion=False)
     
     #trying

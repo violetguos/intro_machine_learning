@@ -29,8 +29,8 @@ def load_data():
     # import and filter data
     newsgroups_train = fetch_20newsgroups(subset='train',remove=('headers', 'footers', 'quotes'))
     newsgroups_test = fetch_20newsgroups(subset='test',remove=('headers', 'footers', 'quotes'))
-
-    return newsgroups_train, newsgroups_test
+    categroies = newsgroups_train.target_names
+    return newsgroups_train, newsgroups_test, categroies
 
 def bow_features(train_data, test_data):
     # Bag-of-words representation
@@ -52,7 +52,7 @@ def tf_idf_features(train_data, test_data):
     tf_idf_test = tf_idf_vectorize.transform(test_data.data)
     return tf_idf_train, tf_idf_test, feature_names
 
-
+single_nn = Perceptron() 
 
 def confusion_mat(true_labels, predict_labels):
     #number of unique labels
@@ -60,29 +60,21 @@ def confusion_mat(true_labels, predict_labels):
     
     conf = np.zeros((20,20))
 
-    true_cate = np.zeros((20))
-    pred_cate = np.zeros((20))
 
-    #count number of labels in true for each of the 20 categories
-    for i in range(20):
-        for j in range(len(true_labels)):
-            if i == true_labels[j]:
-                true_cate[i] +=1
-    
-    for i in range(20):
-        for j in range(len(predict_labels)):
-            if i == true_labels[j]:
-                pred_cate[i] +=1
-    
-    
-    for i in range(20):
-        for j in range(20):
-            conf[i][j] = abs(true_cate[j] - pred_cate[i])
+
+    #count number of labels for each of the 20 categories
+    #for i in range(20):
+    for j in range(len(true_labels)):
+        curr_true_class = true_labels[j]
+        for ii in range(len(predict_labels)):
+            curr_pred_class = predict_labels[ii]#0 to 19
+            conf[int(curr_true_class)][int(curr_pred_class)] +=1    
+                    
         
     return conf
 
 def most_confused_class(conf_mat):
-    return np.unravel_index(conf_mat.argmax, conf_mat.shape())
+    return np.unravel_index(conf_mat.argmax(), conf_mat.shape)
 
 
 def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
@@ -103,7 +95,7 @@ def bnb_baseline(bow_train, train_labels, bow_test, test_labels):
 
 
 def svm_cross_val(X_train, y_train, X_test, y_test):
-    rand_states = [0, 10, 20, 30, 40, 50]
+    rand_states = [0]# [0, 10, 20, 30, 40, 50]
     
     all_accuracy = []
     
@@ -156,8 +148,11 @@ def svm_news(X_train, y_train, X_test, y_test, rand_, y_names=None, confusion=Fa
     print('svm test accuracy = {}'.format((test_pred == y_test).mean()))
     print('svm train confustion matrix')
     #pprint(test_conf.tolist())
-    print test_conf
-    print "most confused classes = ", most_confused_class(conf)
+    print test_conf.max()
+    ci, cj  = most_confused_class(test_conf)
+    #print "u est shape", y_names.shape
+    print "most confused classes = ", y_names[ci], y_names[cj]
+    
     
     #for i in range(20):
     #    for j in range(20):
@@ -217,8 +212,9 @@ def rand_forest_news(X_train, y_train, X_test, y_test, n_estimate, y_names=None,
 
 def nn_news_cross_val(X_train, y_train, X_test, y_test):
     nn_layers = {
-            'Single neuron neural network':Perceptron(),
-            'hidden layer: (1, 2, 1)': MLPClassifier(hidden_layer_sizes=(1, 2, 1)),
+            'Single neuron neural network': Perceptron(),
+            'hidden layer: (20, 10)':MLPClassifier(hidden_layer_sizes=(20,10 )),
+            #'hidden layer: (1, 2, 1)': MLPClassifier(hidden_layer_sizes=(1, 2, 1)),
             'hidden layer: (5, 10, 5)':MLPClassifier(hidden_layer_sizes=(5, 10, 5)),
             'hidden layer: (10, 20, 10)': MLPClassifier(hidden_layer_sizes=(10, 20, 10)),
             'hidden layer: (15, 25, 15)': MLPClassifier(hidden_layer_sizes=(15, 25, 15)),   
@@ -267,15 +263,24 @@ def nn_news(cls, X_train, y_train, X_test, y_test, y_names=None, confusion=False
 
  
 if __name__ == '__main__':
-    train_data, test_data = load_data()
-    train_bow, test_bow, feature_names = bow_features(train_data, test_data)
+    train_data, test_data, categories_20 = load_data()
+    #train_bow, test_bow, feature_names = bow_features(train_data, test_data)
 
     #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
     train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
     
     #TOP 3 algorithms
     #SVM is the best
-    svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    nn_news_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    #svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    #rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    #nn_news_cross_val(train_tf, train_data.target, test_tf, test_data.target)
     
+    #print train_data.target_names [string of categories]
+    #print set(train_data.target)# 0 to 19
+    
+    #final result with The picked hyperparameters
+    svm_news(train_tf, train_data.target, test_tf, test_data.target, 0 , categories_20, confusion=False)
+    
+    #trying
+    #nn_news(single_nn, train_tf, train_data.target, test_tf, test_data.target)
+    #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, 150)

@@ -36,9 +36,9 @@
 \subsubsection{Neural Network}
 \begin{enumerate}
 
-    \item Hypterparameter
+    \item Hypterparameter: number of layers
 	
-	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network by calling  It turns out that the single neural network is the fastest and also most accurate.
+	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network.  It turns out that the single neural network is the fastest and also most accurate.
 
 	\item Train/test loss
 	\begin{itemize}
@@ -54,9 +54,9 @@
 \subsubsection{Random forest}
 \begin{enumerate}
 
-    \item Hypterparameter
+    \item Hypterparameter: number of estimators
 	
-	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network. It turns out that the single neural network is the fastest and also most accurate.
+	I have tried Ensamble with 10 to 150 estimators, and 150 works best after comparing results from cross validation.
 
 	\item Train/test loss
 	\begin{itemize}
@@ -65,7 +65,8 @@
         \end{itemize}
       \item My expectations
       
-      This meets my expectations because Random Forest adds more randomness in each step, and ensamble method is more resistant to overfitting because it assigns weights to different features in each step. My code also tried decision\_tree, and it does not generalize well.
+      This meets my expectations because Random Forest adds more randomness in each step, and ensamble method is more resistant to overfitting because it assigns weights to different features in each step. I also tried decision\_tree, and it does not generalize well.
+      The number of estimators learns better with a larger group of weak learners.
   
 \end{enumerate}
 
@@ -83,7 +84,7 @@
         \end{itemize}
         \item Test confusion matrix
         
-        The most confused classes are class 11 and 20
+        The most confused classes are class 10 and 19
 
 \resizebox{\columnwidth}{!}{%
 \setcounter{MaxMatrixCols}{20}
@@ -145,18 +146,18 @@ $}
 see code
 
 \subsection{SVM on MINIST}
+\subsubsection{without momentum}
 \begin{enumerate}
 	\item Train loss$=0.400699029921$
 	\item Test loss$=0.37243523202$
-	\item classification accuracy on training set $= 0.818503401361$
-	\item classification accuracy on testing set $=0.826985854189$
+	\item classification accuracy on training set $= 0.826985854189$
+	\item classification accuracy on testing set $=0.818503401361$
 \end{enumerate}
 
+\subsubsection{with momentum}
 \begin{enumerate}
-	\item Train loss$=0.400699029921$
-	\item Test loss$=0.37243523202$
-	\item classification accuracy on training set $= 0.809977324263$
-	\item classification accuracy on testing set $=0.817555313747$
+	\item classification accuracy on training set $= 0.817555313747$
+	\item classification accuracy on testing set $=0.809977324263$
 \end{enumerate}
 
 \begin{figure}[H]
@@ -192,14 +193,14 @@ x^T K x &= \Sigma_{i =1}^{d} \lambda_{i} ([x^T U_{i}])^2 >= 0\\
 \end{split}
 \end{equation*}
 
-Then $x^T K x >= 0$ for all $x$ in $ \mathbb{R}^{d}$
+Then $x^T K x >= 0$ for all $x$ in $ \mathbb{R}^{d}$ iff $K$ is postive semidefinite
 
 %%%%%%%%%Q 3.2 %%%%%%%%%%%%%%
 \subsection{Kernel properties}
 %%%%%%%% Q 3.2 q2%%%%%%%%%%%%%
 \subsubsection{$\alpha$}
 Define mapping $\phi (x) = \sqrt{\alpha}$, $\alpha > 0$, and the kernel $\langle \phi(x), \phi(y) \rangle = \alpha$.
-The resulting matrix K has item $K_{ij} = \alpha $, the matrix K has equal number of row and columns, and each element is $\alpha$. Since $\alpha$ > 0, and all elements are equal, K is positive semidefinite
+The resulting matrix K has item $K_{ij} = \alpha $, the matrix K has equal number of row and columns, and element is $\alpha$. Since $\alpha$ > 0, and all elements are equal, K is positive semidefinite
  
  %%%%%%%Q 3.2 q3 %%%%%%%%%%%%%%
 \subsubsection{$f(x), f(y)$}

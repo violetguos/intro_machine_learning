@@ -1,4 +1,4 @@
-\documentclass[letterpaper, 12]{article}
+\documentclass[letterpaper, 12pt]{article}
 
 %% Language and font encodings
 \usepackage[english]{babel}
@@ -33,18 +33,28 @@
 %%%%%%%%%%%Q1 	20 NEWS GROUP  %%%%%%%%%%%%%%
 \section{20 News Group}
 \subsection{Top 3 Algorithms}
+Note: I have added a list of the names of all 20 categories in in load\_data( ) function for debugging purposes. This is does not affect my classification algorithm.
+
 \subsubsection{Neural Network}
 \begin{enumerate}
 
     \item Hypterparameter: number of layers
+    
+	Method: K-fold cross validation
 	
-	In the code nn\_news, I have tried a single layer neural network vs multi-layered neural network.  It turns out that the single neural network is the fastest and also most accurate.
+	II have tried a single layer neural network vs multi-layered neural network.  It turns out that the single neural network is the fastest and also most accurate.
 
 	\item Train/test loss
 	\begin{itemize}
-     \item  Train accuracy 0.971451299275
-     \item Test accuracy 0.632235793946
+	
+     \item  Train accuracy 0.974721583878
+     \item Test accuracy 0.663303239511
         \end{itemize}
+      
+      \item Reason to pick this algorithm
+      
+      Neural network is commonly used in NLP, according to our lecture on neural networks. It is good at handling large data set with any features and produce a non-linear decision boundary.  
+        
       \item My expectations
       
       This meets my expectation because NNs are good at working with a large dataset with many feartures. When I increase the number of hidden layers, accuracy decreases. I think this is because it overfits.
@@ -55,7 +65,9 @@
 \begin{enumerate}
 
     \item Hypterparameter: number of estimators
-	
+    
+	Method: K-fold cross validation
+
 	I have tried Ensamble with 10 to 150 estimators, and 150 works best after comparing results from cross validation.
 
 	\item Train/test loss
@@ -63,6 +75,10 @@
      \item  Train accuracy 0.974721583878
      \item Test accuracy 0.59346787042
         \end{itemize}
+      
+      \item Reason to pick Random forest
+      I have tried decision tree, with different parameters(entropy vs gini) and reduced features, but all end up overfitting. Random forest introduces more randomness and also scales the weights of misclassified data in each iteration. To see decision tree, please uncomment from line 272 to 290 in q1.py.
+      
       \item My expectations
       
       This meets my expectations because Random Forest adds more randomness in each step, and ensamble method is more resistant to overfitting because it assigns weights to different features in each step. I also tried decision\_tree, and it does not generalize well.
@@ -74,7 +90,9 @@
 \begin{enumerate}
 
     \item Hypterparameter: rand\_state
-	
+    
+	Method: K-fold cross validation
+
 	In the code, I have tried different rand\_state and cross validated each. It turns out $rand\_state = 0$ is the best
 	
 	\item Train/test loss
@@ -82,6 +100,16 @@
      \item  Train accuracy  0.972511932119
      \item Test accuracy 0.691980881572
         \end{itemize}
+        
+ 	\item Reason to pick SVM
+	Because of the natural of this given problem, it is still a classification problem. Using neural nets might be an overkill. SVM produces a linear decision boundary with a margin for two classes. It can be extended to multi-class using algorithms such as one-vs-all.
+        
+          \item My expectations
+     
+      SVM is the best out of all. I think it is because it has a linear decision boundary with a margin and does not overfit on training data. The test accuracy is close to single neuron neural net, but still higher.
+  
+
+        
         \item Test confusion matrix
         
         The most confused classes are class 16 talk.politics.guns and 18 talk.politics.misc
@@ -114,11 +142,7 @@ $}
 
 
 
-      \item My expectations
-     
-      SVM is the best out of all. I think it is because it has a linear decision boundary and does not overfit on training data. The test accuracy is close to single neuron neural net, but still higher.
-  
-\end{enumerate}
+    \end{enumerate}
 
 \subsubsection{Bernoulli Baseline}
 \begin{enumerate}
@@ -152,25 +176,33 @@ see code
 	\item Test loss$=0.37243523202$
 	\item classification accuracy on training set $= 0.826985854189$
 	\item classification accuracy on testing set $=0.818503401361$
-\end{enumerate}
-
-\subsubsection{with momentum}
-\begin{enumerate}
-	\item classification accuracy on training set $= 0.817555313747$
-	\item classification accuracy on testing set $=0.809977324263$
-\end{enumerate}
-
-\begin{figure}[H]
+	\item Plot of w
+	\begin{figure}[H]
 \centering
 \includegraphics[width=0.5\textwidth]{q2_3_1.png}
 \caption{\label{}Plot momentum = 0 }
 \end{figure}
+\end{enumerate}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.5\textwidth]{q_2_3_2.png}
-\caption{\label{}Plot momentum = 0.1 }
-\end{figure}
+
+
+
+
+\subsubsection{with momentum}
+\begin{enumerate}
+	\item Train loss = 0.424045274211
+	\item Test loss = 0.394698671058
+	\item classification accuracy on training set $= 0.817555313747$
+	\item classification accuracy on testing set $=0.809977324263$
+	\item Plot of w
+	\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{q_2_3_2.png}
+	\caption{\label{}Plot momentum = 0.1 }
+	\end{figure}
+\end{enumerate}
+
+
 
 
 

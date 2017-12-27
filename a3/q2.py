@@ -254,6 +254,12 @@ def accuracy_func(res, targets):
 def hinge_avg(hinge):
     return np.mean(hinge)
 
+def q2_3_ans1(accu):
+    print "test accuracy ", accu
+
+def q2_3_ans2(accu):
+    print "train accuracy ", accu
+    
 
 if __name__ == '__main__':
     
@@ -291,30 +297,30 @@ if __name__ == '__main__':
     
     penalty = 1
     res = optimize_svm(train_data, train_targets, penalty, gd1, 100, 500)
-    print "svm hinge loss train ", hinge_avg(res.hinge_loss(train_data, train_targets))
-    print "svm hinge loss test ", hinge_avg(res.hinge_loss(test_data, test_targets))
+
     pred_train = res.classify(train_data)
     pred_test = res.classify(test_data)
     
-    print "=======  accuracy , momentum = 0 ======="
+    print "=======  SVM , momentum = 0 ======="
     #print "weight, ", res.w
-    print "test accu ,", accuracy_func(pred_train, train_targets)
-    print "train accu ,", accuracy_func(pred_test, test_targets)
+    print "svm hinge loss train ", hinge_avg(res.hinge_loss(train_data, train_targets))
+    print "svm hinge loss test ", hinge_avg(res.hinge_loss(test_data, test_targets))
+    q2_3_ans1(accuracy_func(pred_train, train_targets))
+    q2_3_ans2(accuracy_func(pred_test, test_targets))
+    print "plot W, momemtum = 0"
+    plot_w(res.w)
     
-    
-    print "======= accuracy, momentum = 0.1 ======="
+    print "======= SVM, momentum = 0.1 ======="
     gd2 = GDOptimizer(0.05, 0.1, 0)
 
     res2 = optimize_svm(train_data, train_targets, penalty, gd2, 100, 500)
     pred_test2 = res2.classify(test_data)
     pred_train2 = res2.classify(train_data)
     #print "weight with momentum ", res2.w 
-    print "test accu momentum ,", accuracy_func(pred_train2, train_targets)
-    print "train accu  momentum ,", accuracy_func(pred_test2, test_targets)
-
-    print "plot W, momemtum = 0"
-    plot_w(res.w)
-    
+    print "svm hinge loss train ", hinge_avg(res2.hinge_loss(train_data, train_targets))
+    print "svm hinge loss test ", hinge_avg(res2.hinge_loss(test_data, test_targets))
+    q2_3_ans1(accuracy_func(pred_train2, train_targets))
+    q2_3_ans2(accuracy_func(pred_test2, test_targets))
     print "plot W, momemtum = 0.1"
     plot_w(res2.w)
     

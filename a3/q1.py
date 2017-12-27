@@ -21,7 +21,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.cluster import KMeans
 from sklearn import tree
-from sklearn.linear_model import Perceptron
 from pprint import pprint
 
 
@@ -52,7 +51,6 @@ def tf_idf_features(train_data, test_data):
     tf_idf_test = tf_idf_vectorize.transform(test_data.data)
     return tf_idf_train, tf_idf_test, feature_names
 
-single_nn = Perceptron() 
 
 def confusion_mat(true_labels, predict_labels):
     #number of unique labels
@@ -221,14 +219,13 @@ def rand_forest_news(X_train, y_train, X_test, y_test, n_estimate, y_names=None,
 
 def nn_news_cross_val(X_train, y_train, X_test, y_test):
     nn_layers = {
-            'Single neuron neural network': Perceptron(),
+            'Single neuron neural network':MLPClassifier(hidden_layer_sizes=(10 )),
             'hidden layer: (20, 10)':MLPClassifier(hidden_layer_sizes=(20,10 )),
             #'hidden layer: (1, 2, 1)': MLPClassifier(hidden_layer_sizes=(1, 2, 1)),
             'hidden layer: (5, 10, 5)':MLPClassifier(hidden_layer_sizes=(5, 10, 5)),
             'hidden layer: (10, 20, 10)': MLPClassifier(hidden_layer_sizes=(10, 20, 10)),
             'hidden layer: (15, 25, 15)': MLPClassifier(hidden_layer_sizes=(15, 25, 15)),   
             }
-    #NOTE: a single neuron NN is a perceptron
     
     all_accuracy = []
     
@@ -268,29 +265,67 @@ def nn_news(cls, X_train, y_train, X_test, y_test, y_names=None, confusion=False
     
     return test_accuracy
     
- 
-
+##############Methods that did not work well#####################
+'''
+def decision_tree_news(X_train, y_train, X_test, y_test,k_, feature_sel = True, y_names=None, confusion=False):
+    
+    
+    clf = tree.DecisionTreeClassifier(criterion = "gini")
+    #clf = tree.DecisionTreeRegressor()
+    
+    if feature_sel:
+        
+        ch2 = SelectKBest(chi2, k=k_)
+        X_train = ch2.fit_transform(X_train, y_train)
+        X_test = ch2.transform(X_test)
+    
+    clf = clf.fit(X_train, y_train)
+    
+    predictions = clf.predict(X_test)
+    
+    print(sklearn.metrics.accuracy_score(y_test,predictions)) 
+'''
  
 if __name__ == '__main__':
-    train_data, test_data, categories_20 = load_data()
-    #train_bow, test_bow, feature_names = bow_features(train_data, test_data)
+#==============================================================================
+    #NOTE: categories would return a list = 
 
-    #bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
+    #     ['alt.atheism',
+    #  'comp.graphics',
+    #  'comp.os.ms-windows.misc',
+    #  'comp.sys.ibm.pc.hardware',
+    #  'comp.sys.mac.hardware',
+    #  'comp.windows.x',
+    #  'misc.forsale',
+    #  'rec.autos',
+    #  'rec.motorcycles',
+    #  'rec.sport.baseball',
+    #  'rec.sport.hockey',
+    #  'sci.crypt',
+    #  'sci.electronics',
+    #  'sci.med',
+    #  'sci.space',
+    #  'soc.religion.christian',
+    #  'talk.politics.guns',
+    #  'talk.politics.mideast',
+    #  'talk.politics.misc',
+    #  'talk.religion.misc']
+    #ONLY FOR DEBUGGIN purposes!
+#==============================================================================
+    train_data, test_data, categories_20 = load_data()
+    train_bow, test_bow, feature_names = bow_features(train_data, test_data)
+
+    bnb_model = bnb_baseline(train_bow, train_data.target, test_bow, test_data.target)
     train_tf, test_tf, feature_tf_names = tf_idf_features(train_data, test_data)
     
     #TOP 3 algorithms
     #SVM is the best
-    #svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    #rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
-    #nn_news_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    svm_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    rand_forest_cross_val(train_tf, train_data.target, test_tf, test_data.target)
+    nn_news_cross_val(train_tf, train_data.target, test_tf, test_data.target)
     
-    #print train_data.target_names [string of categories]
-    #print set(train_data.target)# 0 to 19
-    
+    single_nn = MLPClassifier(hidden_layer_sizes=(10 ))
     #final result with The picked hyperparameters
-    #print test_data.target.shape
     svm_news(train_tf, train_data.target, test_tf, test_data.target, 0 , categories_20, confusion=False)
-    
-    #trying
-    #nn_news(single_nn, train_tf, train_data.target, test_tf, test_data.target)
-    #rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, 150)
+    nn_news(single_nn, train_tf, train_data.target, test_tf, test_data.target)
+    rand_forest_news(train_tf, train_data.target, test_tf, test_data.target, 150)

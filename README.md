@@ -1,13 +1,13 @@
 # intro_machine_learning
 
 ## a1
-Logistic regression
+* Logistic regression
 
 ## a2 
-Naive Bayes model
-Gaussian model
+* Naive Bayes model
+* Gaussian model
 
 ## a3
-Ensemble
-Neural net
-SVM
+* Ensemble
+* Neural net
+* SVM

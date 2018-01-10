@@ -1,0 +1,21 @@
+# Latex Aux, log files
+.aux
+.out
+.log
+.fls
+.toc
+.pdf
+
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+

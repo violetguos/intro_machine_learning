@@ -1,13 +1,14 @@
 # intro_machine_learning
 
 ## a1
-* Logistic regression
+* Logistic regression for housing price predication
 
-## a2 
-* Naive Bayes model
-* Gaussian model
+## a2 handwritten digit recognition
+* Naive Bayes model for handwritten digit recognition
+* Gaussian model for handwritten digit recognition
 
-## a3
-* Ensemble
-* Neural net
+## a3 news clustering
+Implemented
+* Ensemble 
+* Neural net(best model)
 * SVM

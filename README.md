@@ -9,6 +9,7 @@
 * K Nearest Neighbour
 * Naive Bayes model
 * Gaussian model
+* Maximum-a-posteriori
 * cross-validation
 
 ## a3 news clustering(using scikit-learn)

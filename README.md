@@ -12,8 +12,8 @@
 * Maximum-a-posteriori
 * cross-validation
 
-## a3 news clustering(using scikit-learn)
+## a3 news clustering
 Implemented
-* Ensemble 
-* Neural net(best model based on cross-validation)
-* SVM
+* Ensemble (with scikit-learn)
+* Neural net(with scikit-learn)
+* SVM and batch gradient descent (without any ML library)

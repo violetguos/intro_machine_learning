@@ -6,8 +6,9 @@
 
 
 ## a2 handwritten digit recognition(without any ML library)
-* Naive Bayes model for handwritten digit recognition
-* Gaussian model for handwritten digit recognition
+* K Nearest Neighbour
+* Naive Bayes model
+* Gaussian model
 * cross-validation
 
 ## a3 news clustering(using scikit-learn)

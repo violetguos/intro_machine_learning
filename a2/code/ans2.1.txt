@@ -1,0 +1,46 @@
+across k in 10 folds: [0.9644285714285715, 0.9575714285714285, 0.9634285714285715,
+                       0.961, 0.9608571428571429, 0.959, 0.957857142857143,
+                       0.9574285714285715, 0.9555714285714286, 0.9528571428571428,
+                       0.9522857142857143, 0.9514285714285714, 0.9504285714285714, 0.95]
+
+
+using optimal k: test 0.96875 train 1.0
+
+
+k 1 0.96875
+k 15. test 0.9585, train 0.959428571429
+[0.9644285714285715, 0.9575714285714285, 0.9634285714285715, 0.961, 0.9608571428571429, 0.959, 0.957857142857143, 0.9574285714285715, 0.9555714285714286, 0.9528571428571428, 0.9522857142857143, 0.9514285714285714, 0.9504285714285714, 0.95]
+k_1_test_accuracy 0.96875
+k_1_train_accuracy 1.0
+
+
+test acc knum   1 test acc 0.96875
+tarin acc knum  1 train acc 1.0
+test acc knum   2 test acc 0.96175
+tarin acc knum  2 train acc 0.982571428571
+test acc knum   3 test acc 0.96975
+tarin acc knum  3 train acc 0.983428571429
+test acc knum   4 test acc 0.9665
+tarin acc knum  4 train acc 0.978
+test acc knum   5 test acc 0.96775
+tarin acc knum  5 train acc 0.977571428571
+test acc knum   6 test acc 0.9645
+tarin acc knum  6 train acc 0.974285714286
+test acc knum   7 test acc 0.96325
+tarin acc knum  7 train acc 0.973714285714
+test acc knum   8 test acc 0.9615
+tarin acc knum  8 train acc 0.970571428571
+test acc knum   9 test acc 0.9605
+tarin acc knum  9 train acc 0.969285714286
+test acc knum   10 test acc 0.961
+tarin acc knum  10 train acc 0.967571428571
+test acc knum   11 test acc 0.9595
+tarin acc knum  11 train acc 0.965428571429
+test acc knum   12 test acc 0.95825
+tarin acc knum  12 train acc 0.963142857143
+test acc knum   13 test acc 0.95775
+tarin acc knum  13 train acc 0.962428571429
+test acc knum   14 test acc 0.95775
+tarin acc knum  14 train acc 0.960142857143
+test acc knum   15 test acc 0.9585
+tarin acc knum  15 train acc 0.959428571429

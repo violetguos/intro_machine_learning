@@ -221,17 +221,7 @@ def main():
     
     b_m_grad = []
     sigma = []
-    '''
-    for m1 in range(1,401):
-        X_b, y_b = batch_sampler.get_batch(m1)
-        b_m = grad_500(X_b, y_b, w, m1, k, batch_sampler)
-        sigma_per = var_grad(b_m)
-        #print "sig per", sigma_per
-        sigma.append(sigma_per)
-    '''
-    #print "sigma ", sigma
 
-    #########################3
     for m1 in range(1,401):
         #X_b, y_b = batch_sampler.get_batch(m1)
         b_m = grad_var500(X, y, w, m1, k, batch_sampler)
@@ -261,20 +251,7 @@ def main():
     #square Diff = 79165708.6263
     #cosine similarity, diif_cos = 0.999995845102
     
-    
-    
-    
 
-    
-    #print true_grad
-    
-    '''
-    [   905147.49317521   1938519.97649744   2407949.76862212 ...,
-   3509262.95811409  64912228.61128841   2572091.7828057 ]
-[  7.96380447e+06   1.90440009e+07   2.21960820e+07 ...,   3.46361153e+07
-   6.66448338e+08   2.46394200e+07]
-    '''
-    
 
 if __name__ == '__main__':
     main()
